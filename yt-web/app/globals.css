@@ -1,0 +1,193 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Yanney Trends design tokens
+ * --------------------------------
+ * Single source of truth for surface, border, and ink colors. The values
+ * flip automatically when `html.dark` is applied, so any element styled
+ * with `bg-[var(--surface-page)]` etc. supports both themes without
+ * needing a `dark:` modifier sprinkled at the call-site.
+ */
+:root {
+  --grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+
+  /* Surfaces — RGB triplets, used by Tailwind via rgb(var(--…) / <alpha-value>). */
+  --surface-page-rgb: 253 248 250;
+  --surface-page-deep-rgb: 247 245 242;
+  --surface-card-rgb: 255 255 255;
+  --border-soft-rgb: 232 232 232;
+
+  /* Surfaces — direct (used for arbitrary [var(--…)] classes) */
+  --surface-page: rgb(var(--surface-page-rgb));
+  --surface-page-deep: rgb(var(--surface-page-deep-rgb));
+  --surface-card: rgb(var(--surface-card-rgb));
+  --surface-card-soft: #fffafd;
+  --surface-tint: #fff5f9;
+  --surface-tint-deep: #fff8fa;
+  --surface-input: #ffffff;
+  --surface-pop: #fce4ec;
+
+  /* Borders */
+  --border-soft: rgb(var(--border-soft-rgb));
+  --border-pink: #f3b8cc;
+  --border-pink-strong: #e8a4bc;
+  --border-pink-faint: rgba(243, 184, 204, 0.5);
+
+  /* Ink (text) — RGB triplets too, since `text-brand-text/70` etc. is common. */
+  --ink-strong-rgb: 10 10 10;
+  --ink-muted-rgb: 82 82 82;
+  --ink-dimmed-rgb: 115 115 115;
+
+  --ink-strong: rgb(var(--ink-strong-rgb));
+  --ink-muted: rgb(var(--ink-muted-rgb));
+  --ink-dimmed: rgb(var(--ink-dimmed-rgb));
+}
+
+html.dark {
+  --surface-page-rgb: 12 10 9;
+  --surface-page-deep-rgb: 5 5 5;
+  --surface-card-rgb: 28 25 23;
+  --border-soft-rgb: 41 37 36;
+
+  --surface-card-soft: #1c1917;
+  --surface-tint: rgba(255, 46, 136, 0.07);
+  --surface-tint-deep: rgba(255, 46, 136, 0.04);
+  --surface-input: #1c1917;
+  --surface-pop: rgba(255, 46, 136, 0.12);
+
+  --border-pink: rgba(243, 184, 204, 0.22);
+  --border-pink-strong: rgba(243, 184, 204, 0.32);
+  --border-pink-faint: rgba(243, 184, 204, 0.12);
+
+  --ink-strong-rgb: 245 245 244;
+  --ink-muted-rgb: 168 162 158;
+  --ink-dimmed-rgb: 120 113 108;
+}
+
+body {
+  @apply bg-brand-bg text-brand-text antialiased;
+  color-scheme: light;
+}
+
+html.dark body {
+  background-color: var(--surface-page);
+  color: var(--ink-strong);
+  color-scheme: dark;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #ff2e88 rgba(0, 0, 0, 0.06);
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #ff2e88;
+  border-radius: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.nav-link-ui {
+  position: relative;
+}
+
+.nav-link-ui::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background: #ff2e88;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.35s ease;
+}
+
+.nav-link-ui:hover::after,
+.nav-link-ui:focus-visible::after {
+  transform: scaleX(1);
+}
+
+@layer utilities {
+  .grain-overlay {
+    background-image: var(--grain);
+    pointer-events: none;
+  }
+
+  .sticky-fold::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 0 18px 18px;
+    border-color: transparent transparent rgba(0, 0, 0, 0.12) rgba(0, 0, 0, 0.05);
+    border-radius: 0 0 2px 0;
+  }
+
+  @keyframes pink-pulse-outline {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(255, 46, 136, 0);
+    }
+    45% {
+      box-shadow: 0 0 0 3px rgba(255, 46, 136, 0.4);
+    }
+  }
+
+  .add-pulse {
+    animation: pink-pulse-outline 0.75s ease-out 1;
+  }
+
+  @keyframes marquee-scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-marquee {
+    animation: marquee-scroll 30s linear infinite;
+  }
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #checkout-invoice,
+  #checkout-invoice *,
+  .checkout-invoice-print,
+  .checkout-invoice-print * {
+    visibility: visible;
+  }
+  #checkout-invoice,
+  .checkout-invoice-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-width: 100%;
+    box-shadow: none !important;
+    border-color: #e8a4bc !important;
+    background: #fff !important;
+  }
+}

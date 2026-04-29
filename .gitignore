@@ -1,0 +1,8 @@
+# Cursor — MCP config URL embeds your Supabase project ref; keep it local only
+.cursor/mcp.json
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local   
+.env
+.references
