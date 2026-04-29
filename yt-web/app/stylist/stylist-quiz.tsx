@@ -255,7 +255,7 @@ export function StylistQuiz({ products }: { products: CatalogProduct[] }) {
               onBack={() => setStep("q2")}
               onNext={() => setStep("q4")}
             >
-              <div className="space-y-2">
+              <div className="flex justify-start items-end gap-4 border-none">
                 {fits.map((f) => (
                   <ChoiceChipButton
                     key={f.id}
