@@ -7,7 +7,13 @@ export const metadata: Metadata = {
   description: "Find your perfect look in five questions.",
 };
 
-export default async function StylistPage() {
+export default async function StylistPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ occasion?: string }>;
+}) {
+  const { occasion } = await searchParams;
   const products = await getCatalogProducts();
-  return <StylistQuiz products={products} />;
+  const initialOccasion = occasion?.trim() || undefined;
+  return <StylistQuiz products={products} initialOccasion={initialOccasion} />;
 }

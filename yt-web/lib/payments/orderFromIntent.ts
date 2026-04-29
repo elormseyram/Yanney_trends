@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { decrementInventoryForOrderItems } from "@/lib/payments/decrementInventory";
 
 type CheckoutIntentPayload = {
   order_number: string;
@@ -18,7 +19,28 @@ type CheckoutIntentPayload = {
   is_gift_order?: boolean;
   gift_message?: string | null;
   relationship?: string | null;
+  customer_order_notes?: string | null;
+  gift_delivery_notes?: string | null;
+  recipient_name?: string | null;
+  recipient_phone?: string | null;
+  recipient_city?: string | null;
+  recipient_address?: string | null;
 };
+
+function buildOrderMetadata(payload: CheckoutIntentPayload): Record<string, unknown> {
+  const m: Record<string, unknown> = {};
+  if (payload.customer_order_notes?.trim()) m.customer_order_notes = payload.customer_order_notes.trim();
+  if (payload.gift_delivery_notes?.trim()) m.gift_delivery_notes = payload.gift_delivery_notes.trim();
+  if (payload.is_gift_order) {
+    m.gift_recipient = {
+      name: payload.recipient_name?.trim() || null,
+      phone: payload.recipient_phone?.trim() || null,
+      city: payload.recipient_city?.trim() || null,
+      address: payload.recipient_address?.trim() || null,
+    };
+  }
+  return m;
+}
 
 type AdminClient = ReturnType<typeof createAdminClient>;
 
@@ -98,6 +120,7 @@ export async function materializePaidOrderFromIntent(admin: AdminClient, referen
   }
 
   const payload = intent.payload as CheckoutIntentPayload;
+  const meta = buildOrderMetadata(payload);
   const insertRow: Record<string, unknown> = {
     order_number: payload.order_number,
     customer_name: payload.customer_name?.trim() ?? "",
@@ -106,7 +129,6 @@ export async function materializePaidOrderFromIntent(admin: AdminClient, referen
     status: "CONFIRMED",
     payment_status: "PAID",
     payment_method: "paystack",
-    source: "WEBSITE",
     fulfillment_type: payload.fulfillment_type,
     items: payload.items ?? [],
     subtotal: Number(payload.subtotal ?? 0),
@@ -121,9 +143,16 @@ export async function materializePaidOrderFromIntent(admin: AdminClient, referen
     is_gift_order: Boolean(payload.is_gift_order),
     gift_message: payload.gift_message?.trim() || null,
     relationship: payload.relationship?.trim() || null,
+    metadata: Object.keys(meta).length ? meta : {},
   };
   const insertResult = await insertOrderResilient(admin, insertRow);
   if (!insertResult.ok) return insertResult;
+
+  const inv = await decrementInventoryForOrderItems(admin, payload.items ?? []);
+  if (!inv.ok) {
+    // eslint-disable-next-line no-console
+    console.error("[decrementInventoryForOrderItems]", inv.message);
+  }
 
   await admin
     .from("checkout_payment_intents")

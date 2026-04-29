@@ -10,6 +10,7 @@ import type {
   HubProfileRow,
   HubRiderRow,
   ProductCategoryRow,
+  RunwayOutfitPostRow,
   ShopSettingsRow,
 } from "@/lib/hub/types";
 
@@ -39,14 +40,10 @@ export async function fetchOverviewStats(): Promise<
 > {
   try {
     const supabase = await createClient();
-    const sourceCheck = await detectOrdersSourceColumn(supabase);
-    if (!sourceCheck.ok) return sourceCheck;
-    const hasSource = sourceCheck.hasSource;
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const iso = thirtyDaysAgo.toISOString();
 
-    const visibleFilter = "payment_status.eq.PAID,source.neq.WEBSITE,source.is.null";
     const totalQ = supabase.from("orders").select("id", { count: "exact", head: true });
     const openQ = supabase
       .from("orders")
@@ -54,26 +51,31 @@ export async function fetchOverviewStats(): Promise<
       .in("status", OPEN_ORDER_STATUSES);
     const statusQ = supabase
       .from("orders")
-      .select("status, payment_status, source, created_at, total, currency")
+      .select("status, payment_status, created_at, total, currency")
       .gte("created_at", iso)
       .limit(5000);
     const paidQ = supabase
       .from("orders")
-      .select("total, currency, payment_status, source")
+      .select("total, currency, payment_status")
       .eq("payment_status", "PAID")
       .gte("created_at", iso);
 
-    const [totalRes, openRes, statusRes, paidRes, productsRes, profilesRes] = await Promise.all([
-      hasSource ? totalQ.or(visibleFilter) : totalQ,
-      hasSource ? openQ.or(visibleFilter) : openQ,
-      hasSource ? statusQ.or(visibleFilter) : statusQ,
-      hasSource ? paidQ.or(visibleFilter) : paidQ,
+    const [totalRes, openRes, statusRes, paidRes, productsRes] = await Promise.all([
+      totalQ,
+      openQ,
+      statusQ,
+      paidQ,
       supabase.from("products").select("sizes, is_published"),
-      supabase
-        .from("profiles")
-        .select("id", { count: "exact", head: true })
-        .gte("created_at", iso),
     ]);
+
+    const profilesPrimary = await supabase
+      .from("profiles")
+      .select("id", { count: "exact", head: true })
+      .gte("created_at", iso);
+    const profilesRes =
+      profilesPrimary.error && isMissingColumnError(profilesPrimary.error.message)
+        ? await supabase.from("profiles").select("id", { count: "exact", head: true })
+        : profilesPrimary;
 
     if (totalRes.error) return { ok: false, message: totalRes.error.message };
     if (openRes.error) return { ok: false, message: openRes.error.message };
@@ -98,7 +100,6 @@ export async function fetchOverviewStats(): Promise<
     const statuses = (statusRes.data ?? []) as {
       status: string | null;
       payment_status: string | null;
-      source: string | null;
       created_at: string | null;
       total: number | null;
       currency: string | null;
@@ -169,43 +170,28 @@ function isMissingColumnError(message: string): boolean {
   return /column[\s\S]+does not exist/i.test(message);
 }
 
-async function detectOrdersSourceColumn(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-): Promise<{ ok: true; hasSource: boolean } | HubQueryError> {
-  const probe = await supabase.from("orders").select("source").limit(1);
-  if (!probe.error) return { ok: true, hasSource: true };
-  if (isMissingColumnError(probe.error.message)) return { ok: true, hasSource: false };
-  return { ok: false, message: probe.error.message };
-}
-
 export async function fetchOrdersList(): Promise<HubQueryOk<HubOrderListRow[]> | HubQueryError> {
   try {
     const supabase = await createClient();
-    const sourceCheck = await detectOrdersSourceColumn(supabase);
-    if (!sourceCheck.ok) return sourceCheck;
-    const hasSource = sourceCheck.hasSource;
-    const visibleFilter = "payment_status.eq.PAID,source.neq.WEBSITE,source.is.null";
 
     /* Try the full query first; if the schedule columns aren't in the DB yet
      * (older schema), gracefully fall back so the orders list still works. */
     const fullSelect = `${ORDERS_BASE_COLUMNS}, ${ORDERS_SCHEDULE_COLUMNS}`;
-    const primaryQuery = supabase
+    const primary = await supabase
       .from("orders")
       .select(fullSelect)
       .order("created_at", { ascending: false })
       .limit(150);
-    const primary = await (hasSource ? primaryQuery.or(visibleFilter) : primaryQuery);
 
     let data: unknown = primary.data;
     let error = primary.error;
 
     if (error && isMissingColumnError(error.message)) {
-      const fallbackQuery = supabase
+      const fallback = await supabase
         .from("orders")
         .select(ORDERS_BASE_COLUMNS)
         .order("created_at", { ascending: false })
         .limit(150);
-      const fallback = await (hasSource ? fallbackQuery.or(visibleFilter) : fallbackQuery);
       data = fallback.data;
       error = fallback.error;
     }
@@ -431,6 +417,31 @@ export async function fetchShopSettings(): Promise<HubQueryOk<ShopSettingsRow | 
 
     if (error) return { ok: false, message: error.message };
     return { ok: true, data: data as ShopSettingsRow | null };
+  } catch (e) {
+    return err(e);
+  }
+}
+
+export async function fetchRunwayOutfitPosts(): Promise<HubQueryOk<RunwayOutfitPostRow[]> | HubQueryError> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("runway_outfit_posts")
+      .select("id, title, subtitle, hero_image_url, product_ids, bundle_price_ghs, sort_order, is_published, created_at")
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false });
+    if (error) return { ok: false, message: error.message };
+    const rows = (data ?? []).map((r) => {
+      const raw = r as Record<string, unknown>;
+      const ids = Array.isArray(raw.product_ids)
+        ? (raw.product_ids as unknown[]).map((x) => String(x))
+        : [];
+      return {
+        ...raw,
+        product_ids: ids,
+      } as RunwayOutfitPostRow;
+    });
+    return { ok: true, data: rows };
   } catch (e) {
     return err(e);
   }

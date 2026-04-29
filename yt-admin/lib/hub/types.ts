@@ -50,11 +50,24 @@ export type HubOrderDetail = HubOrderListRow & {
   delivery_zone: string | null;
   schedule_decision_note: string | null;
   payment_method: string;
-  source: string;
+  source?: string | null;
+  metadata?: unknown;
   gift_message: string | null;
   relationship: string | null;
   updated_at: string;
   rider?: { id: string; display_name: string; phone: string | null } | null;
+};
+
+export type RunwayOutfitPostRow = {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  hero_image_url: string | null;
+  product_ids: string[];
+  bundle_price_ghs: number;
+  sort_order: number;
+  is_published: boolean;
+  created_at: string;
 };
 
 export type HubRiderRow = {
@@ -106,6 +119,9 @@ export type ShopSettingsRow = {
   pickup_available: boolean;
   announcement_text: string | null;
   announcement_active: boolean;
+  marquee_ticker_text?: string | null;
+  marquee_ticker_active?: boolean;
+  delivery_cutoff_time?: string | null;
 };
 
 export type ProductCategoryRow = {

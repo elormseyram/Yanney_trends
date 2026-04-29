@@ -21,6 +21,12 @@ type Payload = {
   gift_message?: string | null;
   relationship?: string | null;
   mobile_network?: "MTN" | "TELECEL" | "AIRTELTIGO" | null;
+  customer_order_notes?: string | null;
+  gift_delivery_notes?: string | null;
+  recipient_name?: string | null;
+  recipient_phone?: string | null;
+  recipient_city?: string | null;
+  recipient_address?: string | null;
 };
 
 function fallbackEmail(phone: string, orderRef: string) {
@@ -67,6 +73,12 @@ export async function POST(req: Request) {
           is_gift_order: Boolean(body.is_gift_order),
           gift_message: body.gift_message?.trim() || null,
           relationship: body.relationship?.trim() || null,
+          customer_order_notes: body.customer_order_notes?.trim() || null,
+          gift_delivery_notes: body.gift_delivery_notes?.trim() || null,
+          recipient_name: body.recipient_name?.trim() || null,
+          recipient_phone: body.recipient_phone?.trim() || null,
+          recipient_city: body.recipient_city?.trim() || null,
+          recipient_address: body.recipient_address?.trim() || null,
         },
       },
       { onConflict: "reference" },
@@ -86,8 +98,13 @@ export async function POST(req: Request) {
       );
     }
 
-    const origin = req.headers.get("origin") || new URL(req.url).origin;
-    const callback_url = `${origin}/api/paystack/verify?reference=${encodeURIComponent(body.order_number)}`;
+    /* Prefer NEXT_PUBLIC_APP_URL so Paystack can reach your server from the phone
+     * (LAN IP, ngrok, or production URL). Otherwise use the request Origin. */
+    const envBase = process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/$/, "") || "";
+    const headerOrigin = req.headers.get("origin")?.trim() || "";
+    const fallbackOrigin = new URL(req.url).origin;
+    const callbackOrigin = envBase || headerOrigin || fallbackOrigin;
+    const callback_url = `${callbackOrigin}/api/paystack/verify?reference=${encodeURIComponent(body.order_number)}`;
 
     /* Bias the Paystack hosted page toward Mobile Money so the customer
      * lands on the right tab without an extra click. */

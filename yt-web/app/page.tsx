@@ -12,8 +12,7 @@ import { TestimonialsSection } from "@/components/storefront/home/TestimonialsSe
 import { DeliveryPromiseStrip } from "@/components/storefront/home/DeliveryPromiseStrip";
 import { getCategoryShowcaseCounts, pickFeaturedProducts } from "@/lib/catalog";
 import { getCatalogProducts } from "@/lib/catalog.server";
-
-export const revalidate = 60;
+export const revalidate = 30;
 
 export default async function HomePage() {
   const catalog = await getCatalogProducts();

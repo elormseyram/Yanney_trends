@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
-export function getNextDispatchCutoff(): Date {
+export function getNextDispatchCutoff(hour = 18, minute = 0): Date {
   const now = new Date();
   const target = new Date(now);
-  target.setHours(18, 0, 0, 0);
+  target.setHours(hour, minute, 0, 0);
   if (now >= target) {
     target.setDate(target.getDate() + 1);
   }
@@ -19,18 +19,18 @@ export function formatDispatchRemaining(ms: number): string {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
 }
 
-export function useDeliveryCountdown(): string {
+export function useDeliveryCountdown(cutoffHour = 18, cutoffMinute = 0): string {
   const [left, setLeft] = useState("");
 
   useEffect(() => {
     const tick = () => {
-      const t = getNextDispatchCutoff().getTime() - Date.now();
+      const t = getNextDispatchCutoff(cutoffHour, cutoffMinute).getTime() - Date.now();
       setLeft(formatDispatchRemaining(t));
     };
     tick();
     const id = window.setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [cutoffHour, cutoffMinute]);
 
   return left;
 }

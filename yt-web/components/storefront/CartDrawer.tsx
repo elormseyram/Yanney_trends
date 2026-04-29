@@ -3,10 +3,12 @@
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { slideInRight } from "@/lib/motion";
 import { useCartStore } from "@/store/cartStore";
 import { useUiStore } from "@/store/uiStore";
 import { useWishlistStore } from "@/store/wishlistStore";
+import { SwipeToCheckoutBar } from "@/components/storefront/SwipeToCheckoutBar";
 
 function IconTrash({ className }: { className?: string }) {
   return (
@@ -17,6 +19,7 @@ function IconTrash({ className }: { className?: string }) {
 }
 
 export function CartDrawer() {
+  const router = useRouter();
   const items = useCartStore((s) => s.items);
   const isOpen = useCartStore((s) => s.isOpen);
   const closeCart = useCartStore((s) => s.closeCart);
@@ -151,46 +154,24 @@ export function CartDrawer() {
                 <span className="text-brand-muted dark:text-stone-500">Subtotal</span>
                 <span className="text-brand-text dark:text-stone-100">GHS {total.toFixed(2)}</span>
               </div>
+              <SwipeToCheckoutBar
+                disabled={items.length === 0}
+                onComplete={() => {
+                  closeCart();
+                  router.push("/checkout");
+                }}
+              />
               <Link
                 href="/checkout"
                 onClick={closeCart}
-                aria-disabled={items.length === 0}
-                className={`group relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-xl bg-brand-pink py-3.5 pl-5 pr-3 font-jost text-sm font-semibold text-white shadow-sm transition-all hover:bg-brand-pink-hover hover:pr-2 ${
-                  items.length === 0 ? "pointer-events-none opacity-50" : ""
+                className={`mt-2 block text-center font-jost text-xs text-brand-pink underline-offset-2 hover:underline ${
+                  items.length === 0 ? "pointer-events-none opacity-40" : ""
                 }`}
               >
-                <span className="flex items-center gap-2">
-                  <svg
-                    className="h-4 w-4 text-white/90"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    aria-hidden
-                  >
-                    <path d="M5 7h14l-1.4 9.4a2 2 0 0 1-2 1.6H8.4a2 2 0 0 1-2-1.6L5 7Z" strokeLinejoin="round" />
-                    <path d="M9 7V5a3 3 0 0 1 6 0v2" strokeLinejoin="round" />
-                  </svg>
-                  Checkout
-                </span>
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15 transition-transform duration-300 ease-out group-hover:translate-x-1">
-                  <svg
-                    className="h-4 w-4 text-white"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden
-                  >
-                    <path d="M5 12h14" />
-                    <path d="m13 6 6 6-6 6" />
-                  </svg>
-                </span>
+                Or tap here to checkout
               </Link>
               <p className="mt-2 text-center font-jost text-[11px] text-brand-muted dark:text-stone-500">
-                Swipe to pay with Mobile Money
+                After checkout you&apos;ll pay with Mobile Money on the next screens.
               </p>
             </footer>
           </motion.aside>

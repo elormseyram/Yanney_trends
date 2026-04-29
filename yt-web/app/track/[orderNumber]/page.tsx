@@ -7,6 +7,9 @@ import { buildWhatsAppPrefill } from "@/lib/whatsapp";
 import { SHOP_WHATSAPP } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 interface TrackPageProps {
   params: Promise<{ orderNumber: string }>;
   searchParams: Promise<{ surprise?: string; paid?: string }>;

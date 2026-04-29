@@ -7,7 +7,7 @@
 export const choice = {
   /** Full quiz / radio option */
   btn: (active: boolean) =>
-    `rounded-lg border px-4 py-3 text-left font-jost text-sm transition-colors ${
+    `rounded-lg border px-4 py-3 text-left font-jost text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand-pink/25 ${
       active
         ? "border-brand-pink bg-[var(--surface-tint)] text-[var(--ink-strong)] shadow-[inset_0_0_0_1px_rgba(255,46,136,0.12)]"
         : "border-[var(--border-pink)] bg-[var(--surface-card)] text-[var(--ink-muted)] hover:border-brand-pink/50"
@@ -15,7 +15,7 @@ export const choice = {
 
   /** Compact chip (tags, small toggles) */
   chip: (active: boolean) =>
-    `rounded-lg border px-3 py-2 text-left font-jost text-xs transition-colors ${
+    `rounded-lg border px-3 py-2 text-left font-jost text-xs outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand-pink/25 ${
       active
         ? "border-brand-pink bg-[var(--surface-tint)] text-[var(--ink-strong)]"
         : "border-[var(--border-pink)] bg-[var(--surface-card)] text-[var(--ink-muted)] hover:border-brand-pink/50"

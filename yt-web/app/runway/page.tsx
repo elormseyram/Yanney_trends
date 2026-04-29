@@ -1,5 +1,8 @@
 import { RunwayCatalog } from "@/components/storefront/RunwayCatalog";
 import { getCatalogProducts } from "@/lib/catalog.server";
+import { getRunwayOutfitPosts } from "@/lib/runway.server";
+
+export const revalidate = 30;
 
 export const metadata = {
   title: "Inspo — Yanney Trends",
@@ -7,6 +10,6 @@ export const metadata = {
 };
 
 export default async function RunwayPage() {
-  const products = await getCatalogProducts();
-  return <RunwayCatalog products={products} />;
+  const [products, outfitPosts] = await Promise.all([getCatalogProducts(), getRunwayOutfitPosts()]);
+  return <RunwayCatalog products={products} outfitPosts={outfitPosts} />;
 }

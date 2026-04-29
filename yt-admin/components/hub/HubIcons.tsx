@@ -145,6 +145,16 @@ export function StorefrontIcon(props: IconProps) {
   );
 }
 
+export function RunwayInspoIcon(props: IconProps) {
+  return (
+    <svg {...baseProps} {...props}>
+      <path d="M12 3v3M12 18v3M3 12h3M18 12h3" strokeLinecap="round" />
+      <path d="M8 8h8v8H8z" />
+      <path d="m5 19 3-3M16 8l3-3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function MenuIcon(props: IconProps) {
   return (
     <svg {...baseProps} {...props}>
@@ -160,6 +170,24 @@ export function CloseIcon(props: IconProps) {
     <svg {...baseProps} {...props}>
       <path d="m6 6 12 12" />
       <path d="M18 6 6 18" />
+    </svg>
+  );
+}
+
+export function EyeIcon(props: IconProps) {
+  return (
+    <svg {...baseProps} {...props}>
+      <path d="M2 12s4.5-7 10-7 10 7 10 7-4.5 7-10 7-10-7-10-7Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+export function EyeOffIcon(props: IconProps) {
+  return (
+    <svg {...baseProps} {...props}>
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+      <path d="M1 1 22 22" />
     </svg>
   );
 }

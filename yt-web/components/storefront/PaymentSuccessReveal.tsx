@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { InvoiceReceipt, type ReceiptOrder } from "@/components/storefront/InvoiceReceipt";
 import { OrderTracker, type TrackerFulfillment } from "@/components/storefront/OrderTracker";
+import { useCartStore } from "@/store/cartStore";
+import { usePurchaseHistoryStore } from "@/store/purchaseHistoryStore";
 
 type Stage = "celebrate" | "invoice" | "tracker";
 
@@ -27,12 +29,25 @@ export function PaymentSuccessReveal({
   surprise,
 }: PaymentSuccessRevealProps) {
   const [stage, setStage] = useState<Stage>("celebrate");
+  const clearCart = useCartStore((s) => s.clearCart);
+  const addPurchaseHistory = usePurchaseHistoryStore((s) => s.addFromOrder);
 
   useEffect(() => {
     if (stage !== "celebrate") return;
     const t = window.setTimeout(() => setStage("invoice"), 2400);
     return () => window.clearTimeout(t);
   }, [stage]);
+
+  useEffect(() => {
+    const orderNumber = order.order_number?.trim();
+    if (!orderNumber) return;
+    clearCart();
+    const histKey = `yt-payment-history:${orderNumber}`;
+    if (window.sessionStorage.getItem(histKey) === "1") return;
+    const productIds = extractPurchasedProductIds(order.items);
+    if (productIds.length) addPurchaseHistory(productIds);
+    window.sessionStorage.setItem(histKey, "1");
+  }, [order.order_number, order.items, addPurchaseHistory, clearCart]);
 
   return (
     <div className="relative">
@@ -99,6 +114,18 @@ export function PaymentSuccessReveal({
       </AnimatePresence>
     </div>
   );
+}
+
+function extractPurchasedProductIds(rawItems: unknown): string[] {
+  if (!Array.isArray(rawItems)) return [];
+  const ids = rawItems
+    .map((row) => {
+      const item = (row ?? {}) as Record<string, unknown>;
+      const val = item.product_id ?? item.productId ?? null;
+      return typeof val === "string" ? val.trim() : null;
+    })
+    .filter((id): id is string => Boolean(id));
+  return [...new Set(ids)];
 }
 
 function PaymentSummaryStrip() {

@@ -17,7 +17,7 @@ export function HomeVisitTeaser() {
         </div>
         <Link
           href="/find-us"
-          className="inline-flex items-center border border-brand-border bg-brand-elevated px-6 py-3 font-jost text-sm font-medium text-brand-text transition-colors hover:border-brand-pink/50"
+          className="inline-flex items-center rounded-xl border border-brand-border bg-brand-elevated px-6 py-3 font-jost text-sm font-medium text-brand-text transition-colors hover:border-brand-pink/50"
         >
           Find us
         </Link>

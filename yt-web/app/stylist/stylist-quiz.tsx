@@ -41,6 +41,20 @@ const colorOpts = [
   { id: "pastel", label: "Pastels (Pink, Lilac, Mint)" },
 ];
 
+function resolveOccasionFromUrl(raw: string | null | undefined): string | null {
+  if (!raw?.trim()) return null;
+  const t = raw.trim().replace(/\+/g, " ");
+  const lower = t.toLowerCase();
+  const exact = occasions.find((o) => o.toLowerCase() === lower);
+  if (exact) return exact;
+  const partial = occasions.find(
+    (o) =>
+      lower.includes(o.toLowerCase().slice(0, 8)) ||
+      o.toLowerCase().includes(lower.slice(0, 10)),
+  );
+  return partial ?? null;
+}
+
 type Step = "intro" | "q1" | "q2" | "q3" | "q4" | "q5" | "loading" | "results";
 
 const loadingLines = ["Matching your vibe...", "Curating your looks...", "Almost there..."];
@@ -81,13 +95,24 @@ const introTraitChips: { label: string; Icon: typeof IconZap }[] = [
   { label: "Actually useful", Icon: IconCircleCheck },
 ];
 
-export function StylistQuiz({ products }: { products: CatalogProduct[] }) {
+export function StylistQuiz({
+  products,
+  initialOccasion,
+}: {
+  products: CatalogProduct[];
+  initialOccasion?: string | null;
+}) {
   const [step, setStep] = useState<Step>("intro");
   const [answers, setAnswers] = useState<Partial<QuizAnswers>>({
     colors: [],
     budget_max: 600,
   });
   const [loadIdx, setLoadIdx] = useState(0);
+
+  useEffect(() => {
+    const o = resolveOccasionFromUrl(initialOccasion ?? undefined);
+    if (o) setAnswers((a) => ({ ...a, occasion: o }));
+  }, [initialOccasion]);
 
   useEffect(() => {
     if (step !== "loading") return;

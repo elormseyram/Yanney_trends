@@ -19,7 +19,10 @@ export function ChoiceChipButton({
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={(e) => {
+        onClick();
+        window.setTimeout(() => (e.currentTarget as HTMLButtonElement).blur(), 0);
+      }}
       className={`${choice.btn(active)} ${className}`}
     >
       <span className="flex items-center gap-3 text-left">

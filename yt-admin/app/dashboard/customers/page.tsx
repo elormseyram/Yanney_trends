@@ -41,7 +41,36 @@ export default async function CustomersPage() {
             Shoppers who have placed at least {FREQUENT_THRESHOLD} orders. Reach out for thank-yous,
             early access, or loyalty perks.
           </p>
-          <div className="mt-4 overflow-x-auto rounded-xl border border-stone-200 dark:border-stone-700">
+          {frequentRes.ok && frequentRes.data.length === 0 ? (
+            <p className="mt-4 rounded-xl border border-dashed border-stone-300 bg-white py-8 text-center text-sm text-stone-500 md:hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-400">
+              No one has hit {FREQUENT_THRESHOLD} orders yet.
+            </p>
+          ) : null}
+          {frequentRes.ok && frequentRes.data.length > 0 ? (
+            <ul className="mt-4 space-y-3 md:hidden">
+              {frequentRes.data.map((c, i) => (
+                <li
+                  key={`${c.customer_email ?? c.customer_phone ?? c.customer_name}-${i}`}
+                  className="rounded-xl border border-stone-200 bg-white p-4 dark:border-stone-700 dark:bg-stone-900"
+                >
+                  <p className="font-semibold text-stone-900 dark:text-stone-100">{c.customer_name || "—"}</p>
+                  <p className="mt-1 text-xs text-stone-600 dark:text-stone-300">{c.customer_email ?? "—"}</p>
+                  <p className="text-xs text-stone-500">{c.customer_phone}</p>
+                  <div className="mt-3 flex flex-wrap justify-between gap-2 text-sm">
+                    <span className="rounded-full bg-rose-50 px-2 py-0.5 text-xs font-semibold text-rose-700 dark:bg-rose-500/15 dark:text-rose-200">
+                      {c.order_count} orders
+                    </span>
+                    <span className="font-medium text-stone-900 dark:text-stone-100">
+                      {formatMoney(c.total_spent, c.currency)}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs text-stone-500">Last: {formatDateTime(c.last_order_at)}</p>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <div className="-mx-4 mt-4 hidden overflow-x-auto sm:mx-0 md:block">
+            <div className="min-w-full overflow-hidden rounded-xl border border-stone-200 dark:border-stone-700">
             <table className="w-full min-w-[640px] text-left text-sm">
               <thead className="bg-stone-100 dark:bg-stone-800">
                 <tr>
@@ -97,6 +126,7 @@ export default async function CustomersPage() {
                   : null}
               </tbody>
             </table>
+            </div>
           </div>
         </section>
 
@@ -107,7 +137,27 @@ export default async function CustomersPage() {
           <p className="mt-1 text-sm text-stone-600 dark:text-stone-400">
             Customer accounts created when people sign up on the shop.
           </p>
-          <div className="mt-4 overflow-x-auto rounded-xl border border-stone-200 dark:border-stone-700">
+          {profilesRes.ok && profilesRes.data.length === 0 ? (
+            <p className="mt-4 rounded-xl border border-dashed border-stone-300 bg-white py-8 text-center text-sm text-stone-500 md:hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-400">
+              No profiles yet.
+            </p>
+          ) : null}
+          {profilesRes.ok && profilesRes.data.length > 0 ? (
+            <ul className="mt-4 space-y-3 md:hidden">
+              {profilesRes.data.map((row) => (
+                <li
+                  key={row.id}
+                  className="rounded-xl border border-stone-200 bg-white p-4 dark:border-stone-700 dark:bg-stone-900"
+                >
+                  <p className="font-semibold text-stone-900 dark:text-stone-100">{row.full_name ?? "—"}</p>
+                  <p className="mt-1 break-all font-mono text-[11px] text-stone-500">{row.id}</p>
+                  <p className="mt-2 text-xs text-stone-500">Joined {formatDateTime(row.created_at)}</p>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <div className="-mx-4 mt-4 hidden overflow-x-auto sm:mx-0 md:block">
+            <div className="min-w-full overflow-hidden rounded-xl border border-stone-200 dark:border-stone-700">
             <table className="w-full min-w-[520px] text-left text-sm">
               <thead className="bg-stone-100 dark:bg-stone-800">
                 <tr>
@@ -141,6 +191,7 @@ export default async function CustomersPage() {
                   : null}
               </tbody>
             </table>
+            </div>
           </div>
         </section>
 
@@ -151,7 +202,28 @@ export default async function CustomersPage() {
           <p className="mt-1 text-sm text-stone-600 dark:text-stone-400">
             Customers and guest accounts
           </p>
-          <div className="mt-4 overflow-x-auto rounded-xl border border-stone-200 dark:border-stone-700">
+          {contactsRes.ok && contactsRes.data.length === 0 ? (
+            <p className="mt-4 rounded-xl border border-dashed border-stone-300 bg-white py-8 text-center text-sm text-stone-500 md:hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-400">
+              No orders to derive contacts from.
+            </p>
+          ) : null}
+          {contactsRes.ok && contactsRes.data.length > 0 ? (
+            <ul className="mt-4 space-y-3 md:hidden">
+              {contactsRes.data.map((row, i) => (
+                <li
+                  key={`${row.customer_email ?? row.customer_phone}-${i}`}
+                  className="rounded-xl border border-stone-200 bg-white p-4 dark:border-stone-700 dark:bg-stone-900"
+                >
+                  <p className="font-semibold text-stone-900 dark:text-stone-100">{row.customer_name}</p>
+                  <p className="mt-1 text-xs text-stone-600 dark:text-stone-300">{row.customer_email ?? "—"}</p>
+                  <p className="text-xs text-stone-500">{row.customer_phone}</p>
+                  <p className="mt-2 text-xs text-stone-500">Last order: {formatDateTime(row.last_order_at)}</p>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <div className="-mx-4 mt-4 hidden overflow-x-auto sm:mx-0 md:block">
+            <div className="min-w-full overflow-hidden rounded-xl border border-stone-200 dark:border-stone-700">
             <table className="w-full min-w-[560px] text-left text-sm">
               <thead className="bg-stone-100 dark:bg-stone-800">
                 <tr>
@@ -189,6 +261,7 @@ export default async function CustomersPage() {
                   : null}
               </tbody>
             </table>
+            </div>
           </div>
         </section>
       </main>

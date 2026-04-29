@@ -26,7 +26,7 @@ export function ScheduledDeliveryFields({
   onTimeSlotChange,
   showAddress = true,
   title = "SCHEDULED DELIVERY",
-  note = "Choose where we&apos;re going and a day/time that works. We&apos;ll confirm by WhatsApp.",
+  note = "Choose a date and time range for delivery. We will confirm the slot.",
 }: ScheduledDeliveryFieldsProps) {
   const dates = getDeliveryDateOptions();
 

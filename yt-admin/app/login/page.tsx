@@ -1,4 +1,5 @@
 import { signInWithEmailPassword } from "@/app/actions/auth";
+import { LoginPasswordField } from "@/components/hub/LoginPasswordField";
 
 export default async function LoginPage({
   searchParams,
@@ -86,14 +87,7 @@ export default async function LoginPage({
             >
               Password
             </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              className="mt-1 w-full rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-stone-900 outline-none ring-rose-500/30 focus:border-rose-400 focus:ring-2 dark:border-stone-700 dark:bg-stone-950 dark:text-stone-100"
-            />
+            <LoginPasswordField id="password" name="password" required />
           </div>
           <button
             type="submit"

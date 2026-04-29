@@ -68,7 +68,78 @@ export default async function ProductsPage({
           </Link>
         </div>
 
-        <div className="mt-6 overflow-x-auto rounded-xl border border-stone-200 dark:border-stone-700">
+        {res.ok && rows.length === 0 ? (
+          <p className="mt-6 rounded-xl border border-dashed border-stone-300 bg-white py-10 text-center text-sm text-stone-500 md:hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-400">
+            No products yet. Use Add product to create your first item.
+          </p>
+        ) : null}
+
+        {res.ok && rows.length > 0 ? (
+          <ul className="mt-6 space-y-3 md:hidden">
+            {rows.map((p) => {
+              const displayPrice = p.sale_price != null && p.sale_price > 0 ? p.sale_price : p.price;
+              const stockHint = minStockLabel(p.sizes);
+              return (
+                <li
+                  key={p.id}
+                  className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm dark:border-stone-700 dark:bg-stone-900"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <Link
+                        href={`/dashboard/products/${p.id}/edit`}
+                        className="font-semibold text-rose-600 hover:underline dark:text-rose-400"
+                      >
+                        {p.name}
+                      </Link>
+                      <p className="truncate font-mono text-[11px] text-stone-500">{p.slug}</p>
+                      {p.card_subtitle?.trim() ? (
+                        <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">{p.card_subtitle}</p>
+                      ) : null}
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-stone-900 dark:text-stone-100">
+                        {formatMoney(Number(displayPrice))}
+                      </p>
+                      {p.sale_price != null && p.sale_price > 0 ? (
+                        <p className="text-xs text-stone-400 line-through">{formatMoney(Number(p.price))}</p>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs text-stone-600 dark:text-stone-300">
+                    <span className="rounded-full bg-stone-100 px-2 py-0.5 dark:bg-stone-800">
+                      {categoryLabels.get(p.category) ?? humanizeEnum(p.category)}
+                    </span>
+                    {p.colors?.length ? (
+                      <span className="line-clamp-2">{p.colors.join(", ")}</span>
+                    ) : null}
+                  </div>
+                  <div className="mt-2 flex items-center justify-between text-xs text-stone-500">
+                    <span>{stockHint ?? "—"}</span>
+                    {p.is_published ? (
+                      <span className="rounded-full bg-emerald-100 px-2 py-0.5 font-medium text-emerald-900 dark:bg-emerald-500/20 dark:text-emerald-200">
+                        Live
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-stone-200 px-2 py-0.5 font-medium text-stone-700 dark:bg-stone-600 dark:text-stone-200">
+                        Draft
+                      </span>
+                    )}
+                  </div>
+                  <Link
+                    href={`/dashboard/products/${p.id}/edit`}
+                    className="mt-3 flex w-full items-center justify-center rounded-lg border border-stone-300 py-2 text-sm font-medium text-stone-800 dark:border-stone-600 dark:text-stone-100"
+                  >
+                    Edit product
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        ) : null}
+
+        <div className="-mx-4 mt-6 hidden overflow-x-auto sm:mx-0 md:block">
+          <div className="min-w-full overflow-hidden rounded-xl border border-stone-200 dark:border-stone-700">
           <table className="w-full min-w-[640px] text-left text-sm">
             <thead className="bg-stone-100 dark:bg-stone-800">
               <tr>
@@ -157,6 +228,7 @@ export default async function ProductsPage({
                 : null}
             </tbody>
           </table>
+          </div>
         </div>
       </main>
     </>

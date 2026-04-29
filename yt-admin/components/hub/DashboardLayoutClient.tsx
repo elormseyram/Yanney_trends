@@ -44,9 +44,9 @@ export function DashboardLayoutClient({
 
   return (
     <MobileSidebarContext.Provider value={value}>
-      <div className="flex min-h-screen bg-stone-50 print:bg-white dark:bg-stone-900">
+      <div className="min-h-screen bg-stone-50 print:bg-white dark:bg-stone-900">
         <HubSidebar role={role} />
-        <div className="flex min-w-0 flex-1 flex-col print:max-w-none">{children}</div>
+        <div className="flex min-w-0 flex-1 flex-col lg:pl-56 print:max-w-none">{children}</div>
       </div>
     </MobileSidebarContext.Provider>
   );

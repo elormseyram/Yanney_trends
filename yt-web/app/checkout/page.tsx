@@ -9,8 +9,8 @@ import {
 import { ScheduledDeliveryFields } from "@/components/storefront/ScheduledDeliveryFields";
 import { EmptyCartCheckoutAnimation } from "@/components/storefront/EmptyCartCheckoutAnimation";
 import { TermsBeforePaymentModal } from "@/components/storefront/TermsBeforePaymentModal";
+import { useShopSettings } from "@/components/storefront/ShopSettingsProvider";
 import { useCartStore } from "@/store/cartStore";
-import { usePurchaseHistoryStore } from "@/store/purchaseHistoryStore";
 import { getDeliveryDateOptions } from "@/lib/deliverySlots";
 import { choice } from "@/lib/choiceStyles";
 import { DELIVERY_ZONES, getDeliveryZone } from "@/lib/deliveryZones";
@@ -57,9 +57,8 @@ const softInput =
   "mt-1 w-full rounded-lg border border-[var(--border-pink)] bg-[var(--surface-input)] px-3 py-2.5 font-jost text-sm text-[var(--ink-strong)] outline-none transition focus:border-brand-pink/60 focus:ring-2 focus:ring-brand-pink/15 placeholder:text-[var(--ink-dimmed)]";
 
 export default function CheckoutPage() {
+  const { shopIsOpen, deliveryAvailable } = useShopSettings();
   const items = useCartStore((s) => s.items);
-  const clearCart = useCartStore((s) => s.clearCart);
-  const addPurchaseHistory = usePurchaseHistoryStore((s) => s.addFromOrder);
   const [step, setStep] = useState<Step>(1);
 
   const [name, setName] = useState("");
@@ -67,6 +66,7 @@ export default function CheckoutPage() {
   const [email, setEmail] = useState("");
   const [gift, setGift] = useState<GiftFormState>(initialGift);
   const [fulfillment, setFulfillment] = useState<Fulfillment>("PICKUP");
+  const canCheckout = shopIsOpen || (deliveryAvailable && fulfillment === "DELIVERY");
 
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [deliveryDay, setDeliveryDay] = useState("");
@@ -78,6 +78,7 @@ export default function CheckoutPage() {
   const [mobileNetwork, setMobileNetwork] = useState<MobileNetwork | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [payErr, setPayErr] = useState<string | null>(null);
+  const [orderNotes, setOrderNotes] = useState("");
 
   const subtotal = useMemo(
     () => items.reduce((t, i) => t + i.unitPrice * i.quantity, 0),
@@ -123,6 +124,10 @@ export default function CheckoutPage() {
     setStep((s) => Math.min(4, s + 1) as Step);
   };
 
+  const goPrev = () => {
+    setStep((s) => Math.max(1, s - 1) as Step);
+  };
+
   const handleTermsAccept = (acceptanceEmail: string) => {
     setPaymentTermsAccepted(true);
     if (!email.trim() && acceptanceEmail) setEmail(acceptanceEmail);
@@ -144,6 +149,14 @@ export default function CheckoutPage() {
 
   const placeOrderAndPay = async () => {
     setPayErr(null);
+    if (!canCheckout) {
+      setPayErr(
+        deliveryAvailable
+          ? "We're closed for pickup — switch to delivery to continue, or try again when we reopen."
+          : "We're closed for new orders right now. Please try again later.",
+      );
+      return;
+    }
     setIsSubmitting(true);
     const ref = genOrderRef();
     const orderItems = items.map((i) => ({
@@ -182,6 +195,12 @@ export default function CheckoutPage() {
         gift_message: gift.giftMessage || null,
         relationship: gift.relationship || null,
         mobile_network: mobileNetwork,
+        customer_order_notes: orderNotes.trim() || null,
+        gift_delivery_notes: gift.deliveryNotes.trim() || null,
+        recipient_name: gift.isGiftOrder ? gift.recipientName.trim() || null : null,
+        recipient_phone: gift.isGiftOrder ? gift.recipientPhone.trim() || null : null,
+        recipient_city: gift.isGiftOrder ? gift.recipientCity.trim() || null : null,
+        recipient_address: gift.isGiftOrder ? gift.recipientAddress.trim() || null : null,
       }),
     });
     const init = (await res.json()) as { ok: boolean; authorization_url?: string; message?: string };
@@ -191,8 +210,6 @@ export default function CheckoutPage() {
       return;
     }
 
-    addPurchaseHistory(items.map((i) => i.productId));
-    clearCart();
     window.location.assign(init.authorization_url);
   };
 
@@ -212,6 +229,18 @@ export default function CheckoutPage() {
           <p className="mt-2 max-w-md font-jost text-sm text-[var(--ink-muted)]">
             Quick details, pickup or delivery, then pay with Mobile Money.
           </p>
+          {!shopIsOpen && !canCheckout ? (
+            <p className="mt-4 rounded-xl border border-amber-300/80 bg-amber-50 px-4 py-3 font-jost text-sm text-amber-950 dark:border-amber-600/40 dark:bg-amber-950/40 dark:text-amber-100">
+              The boutique is closed for new orders — you can review your cart, but checkout will stay
+              disabled until we reopen.
+            </p>
+          ) : null}
+          {!shopIsOpen && deliveryAvailable ? (
+            <p className="mt-4 rounded-xl border border-sky-200/90 bg-sky-50 px-4 py-3 font-jost text-sm text-sky-950 dark:border-sky-700/50 dark:bg-sky-950/30 dark:text-sky-100">
+              Pickup is paused while we&apos;re closed — choose <span className="font-semibold">Delivery</span>{" "}
+              in the next step to complete your order if delivery is available.
+            </p>
+          ) : null}
         </motion.div>
 
         <div className="mt-10">
@@ -316,13 +345,30 @@ export default function CheckoutPage() {
                         type="radio"
                         name="fulfillment"
                         checked={fulfillment === id}
-                        onChange={() => setFulfillment(id)}
+                        onChange={(e) => {
+                          setFulfillment(id);
+                          window.setTimeout(() => (e.target as HTMLInputElement).blur(), 0);
+                        }}
                         className="text-brand-pink focus:ring-brand-pink"
                       />
                       <span className="font-jost text-sm text-brand-text">{label}</span>
                     </label>
                   ))}
                 </div>
+
+                <label className="mt-4 block">
+                  <span className="font-jost text-xs font-medium uppercase tracking-wide text-brand-dimmed">
+                    Notes for the team (optional)
+                  </span>
+                  <textarea
+                    value={orderNotes}
+                    onChange={(e) => setOrderNotes(e.target.value)}
+                    rows={3}
+                    maxLength={500}
+                    placeholder="Gate codes, styling preferences, leave-at-door instructions…"
+                    className={`${softInput} mt-1.5 min-h-[88px]`}
+                  />
+                </label>
 
                 {fulfillment === "DELIVERY" ? (
                   <div className="space-y-4">
@@ -348,7 +394,10 @@ export default function CheckoutPage() {
                                   type="radio"
                                   name="deliveryZone"
                                   checked={deliveryZoneId === z.id}
-                                  onChange={() => setDeliveryZoneId(z.id)}
+                                  onChange={(e) => {
+                                    setDeliveryZoneId(z.id);
+                                    window.setTimeout(() => (e.target as HTMLInputElement).blur(), 0);
+                                  }}
                                   className="mt-1 text-brand-pink"
                                 />
                                 <div>
@@ -459,7 +508,10 @@ export default function CheckoutPage() {
                         type="radio"
                         name="mobileNetwork"
                         checked={mobileNetwork === opt.id}
-                        onChange={() => setMobileNetwork(opt.id)}
+                        onChange={(e) => {
+                          setMobileNetwork(opt.id);
+                          window.setTimeout(() => (e.target as HTMLInputElement).blur(), 0);
+                        }}
                         className="mt-1 text-brand-pink focus:ring-brand-pink"
                       />
                       <span>
@@ -475,7 +527,7 @@ export default function CheckoutPage() {
                 <div className="flex gap-3 pt-2">
                   <button
                     type="button"
-                    onClick={() => setStep(2)}
+                    onClick={goPrev}
                     className="rounded-xl border border-[var(--border-pink)] bg-[var(--surface-card)] px-5 py-3 font-jost text-sm"
                   >
                     Back
@@ -536,7 +588,7 @@ export default function CheckoutPage() {
                 <div className="flex gap-3">
                   <button
                     type="button"
-                    onClick={() => setStep(3)}
+                    onClick={goPrev}
                     className="rounded-xl border border-[var(--border-pink)] bg-[var(--surface-card)] px-5 py-3 font-jost text-sm"
                   >
                     Back
@@ -546,7 +598,7 @@ export default function CheckoutPage() {
                     onClick={placeOrderAndPay}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    disabled={isSubmitting || !mobileNetwork}
+                    disabled={isSubmitting || !mobileNetwork || !canCheckout}
                     className={`relative flex-1 overflow-hidden ${choice.cta} py-3.5 disabled:cursor-not-allowed disabled:opacity-60`}
                   >
                     <span className="relative font-semibold">

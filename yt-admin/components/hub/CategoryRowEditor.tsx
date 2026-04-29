@@ -64,7 +64,11 @@ export function CategoryRowEditor({
       </div>
 
       {open ? (
-        <form action={updateCategory} className="mt-4 grid gap-3 border-t border-stone-200 pt-4 dark:border-stone-700 sm:grid-cols-2">
+        <form
+          action={updateCategory}
+          encType="multipart/form-data"
+          className="mt-4 grid gap-3 border-t border-stone-200 pt-4 dark:border-stone-700 sm:grid-cols-2"
+        >
           <input type="hidden" name="slug" value={category.slug} />
           <div className="sm:col-span-2">
             <label
@@ -109,6 +113,21 @@ export function CategoryRowEditor({
               type="url"
               defaultValue={category.image_url ?? ""}
               placeholder="https://…"
+              className="mt-1 w-full rounded-lg border border-stone-200 px-3 py-2 text-sm dark:border-stone-600 dark:bg-stone-950"
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label
+              htmlFor={`image-file-${category.slug}`}
+              className="text-xs font-medium text-stone-600 dark:text-stone-400"
+            >
+              Upload image
+            </label>
+            <input
+              id={`image-file-${category.slug}`}
+              name="image_file"
+              type="file"
+              accept="image/*"
               className="mt-1 w-full rounded-lg border border-stone-200 px-3 py-2 text-sm dark:border-stone-600 dark:bg-stone-950"
             />
           </div>

@@ -18,7 +18,7 @@ export function StylistTeaserSection() {
           transition={{ duration: 0.6 }}
           className="flex justify-center"
         >
-          <div className="relative aspect-[2/3] w-full max-w-[280px] overflow-hidden border border-brand-border">
+          <div className="relative aspect-[2/3] w-full max-w-[280px] overflow-hidden rounded-2xl border border-brand-border">
             <Image
               src={editorialImg}
               alt="Editorial styling"
@@ -43,7 +43,7 @@ export function StylistTeaserSection() {
           </p>
           <Link
             href="/stylist"
-            className="mt-8 inline-block border border-brand-pink bg-[var(--surface-card-soft)] px-8 py-3.5 font-jost text-sm font-semibold text-brand-text transition-colors hover:bg-brand-pink-muted"
+            className="mt-8 inline-block rounded-xl border border-brand-pink bg-[var(--surface-card-soft)] px-8 py-3.5 font-jost text-sm font-semibold text-brand-text transition-colors hover:bg-brand-pink-muted"
           >
             Get styled
           </Link>

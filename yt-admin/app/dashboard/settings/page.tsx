@@ -6,6 +6,8 @@ import { QueryErrorBanner } from "@/components/hub/QueryErrorBanner";
 import { updateShopSettings } from "@/app/actions/hub-settings";
 import { FormFlash } from "@/components/hub/FormFlash";
 import { AnnouncementField } from "@/components/hub/AnnouncementField";
+import { MarqueeTickerField } from "@/components/hub/MarqueeTickerField";
+import { AdminThemeSettings } from "@/components/hub/AdminThemeSettings";
 
 export default async function SettingsPage({
   searchParams,
@@ -37,8 +39,10 @@ export default async function SettingsPage({
         </p>
 
         {shop ? (
-          <form action={updateShopSettings} className="space-y-6">
-            <input type="hidden" name="id" value={shop.id} />
+          <>
+            <AdminThemeSettings />
+            <form action={updateShopSettings} className="space-y-6">
+              <input type="hidden" name="id" value={shop.id} />
 
             <section className="rounded-xl border border-stone-200 bg-white p-5 dark:border-stone-700 dark:bg-stone-900">
               <h2 className="font-semibold text-stone-900 dark:text-stone-100">Shop</h2>
@@ -121,6 +125,36 @@ export default async function SettingsPage({
               defaultText={shop.announcement_text ?? ""}
               defaultActive={shop.announcement_active}
             />
+
+            <MarqueeTickerField
+              defaultText={shop.marquee_ticker_text ?? ""}
+              defaultActive={Boolean(shop.marquee_ticker_active)}
+            />
+
+            <section className="rounded-xl border border-stone-200 bg-white p-5 dark:border-stone-700 dark:bg-stone-900">
+              <h2 className="font-semibold text-stone-900 dark:text-stone-100">Order batch countdown</h2>
+              <p className="mt-1 text-sm text-stone-600 dark:text-stone-400">
+                Shoppers see a live countdown to this time on the home marquee and the shop banner (local time
+                on their device).
+              </p>
+              <div className="mt-4">
+                <label htmlFor="delivery_cutoff_time" className="text-xs font-medium text-stone-600 dark:text-stone-400">
+                  Daily cut-off time
+                </label>
+                <input
+                  id="delivery_cutoff_time"
+                  name="delivery_cutoff_time"
+                  type="time"
+                  required
+                  defaultValue={
+                    shop.delivery_cutoff_time
+                      ? String(shop.delivery_cutoff_time).slice(0, 5)
+                      : "20:00"
+                  }
+                  className="mt-1 block rounded-lg border border-stone-200 px-3 py-2 text-sm dark:border-stone-600 dark:bg-stone-950"
+                />
+              </div>
+            </section>
 
             <section className="rounded-xl border border-stone-200 bg-white p-5 dark:border-stone-700 dark:bg-stone-900">
               <div className="flex flex-wrap items-end justify-between gap-3">
@@ -209,15 +243,16 @@ export default async function SettingsPage({
               </div>
             </section>
 
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                className="rounded-lg bg-rose-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-rose-600"
-              >
-                Save shop settings
-              </button>
-            </div>
-          </form>
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className="rounded-lg bg-rose-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-rose-600"
+                >
+                  Save shop settings
+                </button>
+              </div>
+            </form>
+          </>
         ) : res.ok && !shop ? (
           <p className="text-sm text-stone-600 dark:text-stone-400">
             Shop details are not set up yet. Whoever launched the site needs to add your opening hours, fees, and contact

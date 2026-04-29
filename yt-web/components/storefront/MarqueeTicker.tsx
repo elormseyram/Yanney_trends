@@ -1,13 +1,34 @@
 "use client";
 
 import { useDeliveryCountdown } from "@/lib/deliveryCountdown";
+import { useShopSettings } from "@/components/storefront/ShopSettingsProvider";
 
 type MarqueeVariant = "light" | "dark";
 
+const FALLBACK_STRIP =
+  "NEW ARRIVALS · DANSOMAN ACCRA · IN-STORE PICKUP · MOBILE MONEY ACCEPTED · DRESS BOLD MOVE DIFFERENT · ";
+
 export function MarqueeTicker({ variant = "light" }: { variant?: MarqueeVariant }) {
-  const countdown = useDeliveryCountdown();
-  const text =
-    "NEW ARRIVALS · DANSOMAN ACCRA · IN-STORE PICKUP · MOBILE MONEY ACCEPTED · DRESS BOLD MOVE DIFFERENT · ";
+  const {
+    announcementText,
+    announcementActive,
+    marqueeTickerText,
+    marqueeTickerActive,
+    deliveryCutoffHour,
+    deliveryCutoffMinute,
+  } = useShopSettings();
+  const countdown = useDeliveryCountdown(deliveryCutoffHour, deliveryCutoffMinute);
+
+  const adminLine =
+    announcementActive && announcementText?.trim()
+      ? `${announcementText.trim().replace(/\s+/g, " ")} · `
+      : "";
+  const strip =
+    marqueeTickerActive && marqueeTickerText?.trim()
+      ? `${marqueeTickerText.trim().replace(/\s+/g, " ")} · `
+      : FALLBACK_STRIP;
+  const text = `${adminLine}${strip}`;
+
   const isDark = variant === "dark";
   return (
     <div

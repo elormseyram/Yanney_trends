@@ -42,8 +42,12 @@ export function CategoryShowcase({
                 className={i === 4 ? "col-span-2 md:col-span-1" : ""}
               >
                 <Link
-                  href={`/shop?category=${c.slug}`}
-                  className="group relative block aspect-[3/4] overflow-hidden border border-transparent bg-brand-elevated transition-colors hover:border-brand-border"
+                  href={
+                    c.slug === "looks"
+                      ? "/stylist?occasion=" + encodeURIComponent("Photoshoot")
+                      : `/shop?category=${c.slug}`
+                  }
+                  className="group relative block aspect-[3/4] overflow-hidden rounded-2xl border border-transparent bg-brand-elevated transition-colors hover:border-brand-border"
                 >
                   <Image
                     src={c.src}

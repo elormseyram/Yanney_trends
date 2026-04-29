@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getHubContext } from "@/lib/hub-auth";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 const BASE = "/dashboard/categories";
 
@@ -27,6 +28,34 @@ function intOr(raw: FormDataEntryValue | null, fallback: number): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
+const CATEGORY_IMAGE_BUCKET = "product-images";
+
+function extFromFile(file: File): string {
+  const byName = file.name.split(".").pop()?.toLowerCase() ?? "";
+  if (byName && /^[a-z0-9]+$/.test(byName)) return byName;
+  if (file.type === "image/jpeg") return "jpg";
+  if (file.type === "image/png") return "png";
+  if (file.type === "image/webp") return "webp";
+  if (file.type === "image/gif") return "gif";
+  return "jpg";
+}
+
+async function uploadCategoryImage(
+  supabase: SupabaseClient,
+  categorySlug: string,
+  file: File | null,
+): Promise<string | null> {
+  if (!file || file.size <= 0) return null;
+  const ext = extFromFile(file);
+  const path = `categories/${categorySlug.toLowerCase()}-${Date.now()}.${ext}`;
+  const { error: uploadError } = await supabase.storage
+    .from(CATEGORY_IMAGE_BUCKET)
+    .upload(path, file, { upsert: true, contentType: file.type || undefined });
+  if (uploadError) fail(`Image upload failed: ${uploadError.message}`);
+  const { data } = supabase.storage.from(CATEGORY_IMAGE_BUCKET).getPublicUrl(path);
+  return data.publicUrl || null;
+}
+
 export async function createCategory(formData: FormData): Promise<void> {
   const ctx = await getHubContext();
   if (!ctx) redirect("/login");
@@ -34,7 +63,8 @@ export async function createCategory(formData: FormData): Promise<void> {
   const label = String(formData.get("label") ?? "").trim();
   const rawSlug = String(formData.get("slug") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim() || null;
-  const image_url = String(formData.get("image_url") ?? "").trim() || null;
+  const image_url_input = String(formData.get("image_url") ?? "").trim() || null;
+  const image_file = formData.get("image_file");
   const sort_order = intOr(formData.get("sort_order"), 0);
   const is_visible = formData.get("is_visible") !== "off";
 
@@ -44,6 +74,12 @@ export async function createCategory(formData: FormData): Promise<void> {
   if (!slug) fail("Could not derive a slug. Try a different name.");
 
   const supabase = await createClient();
+  const uploadedImageUrl = await uploadCategoryImage(
+    supabase,
+    slug,
+    image_file instanceof File ? image_file : null,
+  );
+  const image_url = uploadedImageUrl ?? image_url_input;
   const { error } = await supabase.from("product_categories").insert({
     slug,
     label,
@@ -72,7 +108,8 @@ export async function updateCategory(formData: FormData): Promise<void> {
   const slug = String(formData.get("slug") ?? "").trim();
   const label = String(formData.get("label") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim() || null;
-  const image_url = String(formData.get("image_url") ?? "").trim() || null;
+  const image_url_input = String(formData.get("image_url") ?? "").trim() || null;
+  const image_file = formData.get("image_file");
   const sort_order = intOr(formData.get("sort_order"), 0);
   const is_visible = formData.get("is_visible") === "on";
 
@@ -80,6 +117,12 @@ export async function updateCategory(formData: FormData): Promise<void> {
   if (!label) fail("Category name is required.");
 
   const supabase = await createClient();
+  const uploadedImageUrl = await uploadCategoryImage(
+    supabase,
+    slug,
+    image_file instanceof File ? image_file : null,
+  );
+  const image_url = uploadedImageUrl ?? image_url_input;
   const { error } = await supabase
     .from("product_categories")
     .update({ label, description, image_url, sort_order, is_visible })

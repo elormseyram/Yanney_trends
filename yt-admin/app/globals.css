@@ -12,11 +12,9 @@
   --font-serif: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0c0a09;
-    --foreground: #fafaf9;
-  }
+.dark {
+  --background: #0c0a09;
+  --foreground: #fafaf9;
 }
 
 body {

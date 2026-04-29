@@ -75,12 +75,6 @@ function mapRow(row: Record<string, unknown>): CatalogProduct {
   const cardRaw = row.card_subtitle;
   const cardSubtitle =
     cardRaw == null || cardRaw === "" ? null : String(cardRaw).trim() || null;
-  const totalStockUnits =
-    row.total_stock_units == null || row.total_stock_units === ""
-      ? null
-      : num(row.total_stock_units, -1) >= 0
-        ? num(row.total_stock_units, 0)
-        : null;
 
   const pairing_ids = asStrArray(row.pairing_ids);
   const outfitRaw = row.outfit_group_id;
@@ -92,6 +86,18 @@ function mapRow(row: Record<string, unknown>): CatalogProduct {
     saleRaw == null || saleRaw === "" ? null : num(saleRaw, NaN);
   const sale_price =
     saleParsed != null && Number.isFinite(saleParsed) && saleParsed > 0 ? saleParsed : null;
+
+  const sizes = parseSizes(row.sizes);
+  const summedStock = sizes.reduce((n, s) => n + Math.max(0, Math.round(Number(s.stock ?? 0))), 0);
+  /** Prefer sum of SKU rows so PDP/cards match hub inventory after sales (column can lag). */
+  const totalStockUnits =
+    sizes.length > 0
+      ? summedStock
+      : row.total_stock_units == null || row.total_stock_units === ""
+        ? null
+        : num(row.total_stock_units, -1) >= 0
+          ? num(row.total_stock_units, 0)
+          : null;
 
   return {
     id,
@@ -107,7 +113,7 @@ function mapRow(row: Record<string, unknown>): CatalogProduct {
     category: String(row.category ?? "ACCESSORY"),
     price: num(row.price, 0),
     sale_price,
-    sizes: parseSizes(row.sizes),
+    sizes,
     images: parseImages(row.images),
     tags: asStrArray(row.tags),
     mood_tags: asStrArray(row.mood_tags),

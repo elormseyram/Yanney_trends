@@ -30,7 +30,9 @@ export async function updateShopSettings(formData: FormData): Promise<void> {
   const zone_b_name = String(formData.get("zone_b_name") ?? "").trim() || "Zone B";
   const zone_c_name = String(formData.get("zone_c_name") ?? "").trim() || "Zone C";
 
-  const payload = {
+  const cutoffRaw = String(formData.get("delivery_cutoff_time") ?? "").trim();
+
+  const payload: Record<string, unknown> = {
     shop_name,
     tagline: String(formData.get("tagline") ?? "").trim() || null,
     shop_address: String(formData.get("shop_address") ?? "").trim() || null,
@@ -47,8 +49,13 @@ export async function updateShopSettings(formData: FormData): Promise<void> {
     pickup_available: formData.get("pickup_available") === "on",
     announcement_text: String(formData.get("announcement_text") ?? "").trim() || null,
     announcement_active: formData.get("announcement_active") === "on",
+    marquee_ticker_text: String(formData.get("marquee_ticker_text") ?? "").trim() || null,
+    marquee_ticker_active: formData.get("marquee_ticker_active") === "on",
     updated_at: new Date().toISOString(),
   };
+  if (cutoffRaw) {
+    payload.delivery_cutoff_time = cutoffRaw.length === 5 ? `${cutoffRaw}:00` : cutoffRaw;
+  }
 
   const supabase = await createClient();
   const { error } = await supabase.from("shop_settings").update(payload).eq("id", id);

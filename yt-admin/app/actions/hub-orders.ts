@@ -28,7 +28,10 @@ export async function updateOrderStatus(formData: FormData): Promise<void> {
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.from("orders").update({ status }).eq("id", orderId);
+  const { error } = await supabase
+    .from("orders")
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq("id", orderId);
 
   if (error) {
     const target = redirectToRaw
@@ -63,7 +66,7 @@ export async function updateOrderPaymentStatus(formData: FormData): Promise<void
   const supabase = await createClient();
   const { error } = await supabase
     .from("orders")
-    .update({ payment_status: paymentStatus })
+    .update({ payment_status: paymentStatus, updated_at: new Date().toISOString() })
     .eq("id", orderId);
 
   if (error) {
@@ -89,7 +92,10 @@ export async function updateOrderRider(formData: FormData): Promise<void> {
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.from("orders").update({ delivery_rider_id }).eq("id", orderId);
+  const { error } = await supabase
+    .from("orders")
+    .update({ delivery_rider_id, updated_at: new Date().toISOString() })
+    .eq("id", orderId);
 
   if (error) {
     redirect(`/dashboard/orders/${orderId}?err=${encodeURIComponent(error.message)}`);
@@ -129,6 +135,7 @@ export async function updateScheduleApproval(formData: FormData): Promise<void> 
       schedule_decision_note: note,
       schedule_decided_at: decision === "PENDING" ? null : new Date().toISOString(),
       schedule_decided_by: decision === "PENDING" ? null : ctx.user.id,
+      updated_at: new Date().toISOString(),
     })
     .eq("id", orderId);
 

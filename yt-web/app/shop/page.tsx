@@ -3,7 +3,7 @@ import { ShopShell } from "@/app/shop/shop-shell";
 import { filterCatalogByCategorySlug } from "@/lib/catalog";
 import { getCatalogProducts } from "@/lib/catalog.server";
 
-export const revalidate = 60;
+export const revalidate = 30;
 
 interface ShopPageProps {
   searchParams: Promise<{ category?: string }>;
@@ -28,7 +28,6 @@ function ShopFallback() {
 async function ShopContent({ category }: { category?: string }) {
   const catalog = await getCatalogProducts();
   const products = category ? filterCatalogByCategorySlug(catalog, category) : catalog;
-
   return (
     <ShopShell
       key={category ?? "all"}

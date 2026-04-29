@@ -33,7 +33,81 @@ export default async function OrdersPage({
           and pickup approvals.
         </p>
 
-        <div className="mt-6 overflow-x-auto overflow-hidden rounded-xl border border-stone-200 dark:border-stone-700">
+        {res.ok && res.data.length === 0 ? (
+          <p className="mt-6 rounded-xl border border-dashed border-stone-300 bg-white py-10 text-center text-sm text-stone-500 md:hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-400">
+            No orders yet. New orders from the website will show up here.
+          </p>
+        ) : null}
+
+        {res.ok && res.data.length > 0 ? (
+          <ul className="mt-6 space-y-3 md:hidden">
+            {res.data.map((o) => {
+              const needsApproval =
+                Boolean(o.scheduled_date) &&
+                (o.schedule_status ?? "PENDING") === "PENDING" &&
+                PICKUP_LIKE.has(o.fulfillment_type);
+              return (
+                <li
+                  key={o.id}
+                  className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm dark:border-stone-700 dark:bg-stone-900"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div>
+                      <Link
+                        href={`/dashboard/orders/${o.id}`}
+                        className="font-semibold text-rose-600 hover:underline dark:text-rose-400"
+                      >
+                        {o.order_number}
+                      </Link>
+                      {o.is_gift_order ? (
+                        <span className="ml-2 text-[10px] font-medium uppercase text-rose-500">Gift</span>
+                      ) : null}
+                      <p className="mt-1 text-sm text-stone-800 dark:text-stone-100">{o.customer_name}</p>
+                      {o.customer_email ? (
+                        <p className="text-xs text-stone-500">{o.customer_email}</p>
+                      ) : null}
+                    </div>
+                    <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">
+                      {formatMoney(Number(o.total ?? 0), o.currency)}
+                    </p>
+                  </div>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <OrderStatusInlineSelect orderId={o.id} defaultStatus={o.status} />
+                    <PaymentStatusBadge status={o.payment_status} />
+                  </div>
+                  <div className="mt-3 text-xs text-stone-600 dark:text-stone-300">
+                    {o.scheduled_date ? (
+                      <div className="space-y-1">
+                        <div>
+                          {o.scheduled_date}
+                          {o.scheduled_slot ? ` · ${o.scheduled_slot}` : ""}
+                        </div>
+                        <ScheduleBadge status={o.schedule_status ?? "PENDING"} highlight={needsApproval} />
+                      </div>
+                    ) : (
+                      <span className="text-stone-400">No schedule</span>
+                    )}
+                  </div>
+                  <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-stone-500">
+                    <span>{o.rider_display_name ? `Rider: ${o.rider_display_name}` : "Rider: —"}</span>
+                    <span>{formatDateTime(o.created_at)}</span>
+                  </div>
+                  <div className="mt-3">
+                    <Link
+                      href={`/dashboard/orders/${o.id}`}
+                      className="inline-flex w-full items-center justify-center rounded-lg border border-stone-300 py-2 text-sm font-medium text-stone-800 dark:border-stone-600 dark:text-stone-100"
+                    >
+                      View order
+                    </Link>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        ) : null}
+
+        <div className="-mx-4 mt-6 hidden overflow-x-auto sm:mx-0 md:block">
+          <div className="min-w-full overflow-hidden rounded-xl border border-stone-200 dark:border-stone-700">
           <table className="w-full min-w-[860px] text-left text-sm">
             <thead className="bg-stone-100 dark:bg-stone-800">
               <tr>
@@ -127,6 +201,7 @@ export default async function OrdersPage({
                 : null}
             </tbody>
           </table>
+          </div>
         </div>
       </main>
     </>

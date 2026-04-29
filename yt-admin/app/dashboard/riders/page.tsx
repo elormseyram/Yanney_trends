@@ -100,7 +100,7 @@ export default async function RidersPage({
           <div className="border-b border-stone-200 px-4 py-3 dark:border-stone-700">
             <h2 className="text-sm font-semibold text-stone-900 dark:text-stone-100">Rider roster</h2>
           </div>
-          <div className="overflow-x-auto">
+          <div className="-mx-4 overflow-x-auto sm:mx-0">
             <table className="w-full min-w-[640px] text-left text-sm">
               <thead className="bg-stone-100 dark:bg-stone-800">
                 <tr>

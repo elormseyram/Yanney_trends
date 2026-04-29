@@ -15,6 +15,7 @@ import {
   OwnerIcon,
   ReportsIcon,
   RidersIcon,
+  RunwayInspoIcon,
   SettingsIcon,
   StorefrontIcon,
   TeamIcon,
@@ -42,6 +43,7 @@ const ownerNav: readonly NavItem[] = [
   { href: "/dashboard/owner", label: "Owner overview", icon: OwnerIcon },
   { href: "/dashboard/owner/reports", label: "Reports & margins", icon: ReportsIcon },
   { href: "/dashboard/owner/payment-intents", label: "Payment intents", icon: AnalyticsIcon },
+  { href: "/dashboard/owner/runway-inspo", label: "Runway inspo", icon: RunwayInspoIcon },
   { href: "/dashboard/owner/access", label: "Team & access", icon: TeamIcon },
   { href: "/dashboard/settings", label: "Shop settings", icon: SettingsIcon },
 ] as const;
@@ -75,7 +77,7 @@ export default function HubSidebar({ role }: { role: HubSidebarRole }) {
       />
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col border-r border-stone-200 bg-[#fdf8fa] transition-transform duration-200 lg:static lg:z-auto lg:w-56 lg:translate-x-0 print:hidden dark:border-stone-800 dark:bg-stone-950 ${
+        className={`fixed inset-y-0 left-0 z-40 flex h-screen w-64 shrink-0 flex-col overflow-hidden border-r border-stone-200 bg-[#fdf8fa] transition-transform duration-200 lg:w-56 lg:translate-x-0 print:hidden dark:border-stone-800 dark:bg-stone-950 ${
           isOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full lg:shadow-none"
         }`}
         aria-label="Primary navigation"
@@ -83,7 +85,7 @@ export default function HubSidebar({ role }: { role: HubSidebarRole }) {
         <div className="flex items-center justify-between border-b border-stone-200 p-4 dark:border-stone-800">
           <div>
             <p className="font-semibold tracking-tight text-stone-900 dark:text-stone-100">
-              Yanney Hub
+              Yanney Trends
             </p>
             <p className="text-xs text-stone-500 dark:text-stone-400">
               {role === "owner" ? "Owner" : "Admin"}
@@ -99,7 +101,7 @@ export default function HubSidebar({ role }: { role: HubSidebarRole }) {
           </button>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
+        <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-3">
           <p className="px-2 text-[10px] font-semibold uppercase tracking-wider text-stone-400">
             Boutique
           </p>

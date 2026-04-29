@@ -5,19 +5,29 @@ import Image from "next/image";
 import Link from "next/link";
 
 const shots = [
-  { src: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&h=600&fit=crop", caption: "Evening line", slug: "editorial-midi-dress" },
-  { src: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&h=600&fit=crop", caption: "City nights", slug: "structured-blazer-set" },
-  { src: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&fit=crop", caption: "Soft tailoring", slug: "minimal-shift-dress" },
-  { src: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&h=600&fit=crop", caption: "Weekend", slug: "two-piece-linen-set" },
-  { src: "https://images.unsplash.com/photo-1550614000-4b9519e02a4d?w=600&h=600&fit=crop", caption: "Accessories", slug: "woven-clutch-onyx" },
+  { src: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&h=600&fit=crop", caption: "Evening line" },
+  { src: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&h=600&fit=crop", caption: "City nights" },
+  { src: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&fit=crop", caption: "Soft tailoring" },
+  { src: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&h=600&fit=crop", caption: "Weekend" },
+  { src: "https://images.unsplash.com/photo-1550614000-4b9519e02a4d?w=600&h=600&fit=crop", caption: "Accessories" },
 ];
 
 export function LookbookStrip() {
   return (
     <section className="border-y border-brand-border bg-brand-bg py-16 md:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h2 className="font-bebas text-3xl tracking-wide text-brand-text">LOOKBOOK</h2>
-        <p className="mt-2 font-jost text-sm text-brand-muted">Scroll — tap a look to shop.</p>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h2 className="font-bebas text-3xl tracking-wide text-brand-text">LOOKBOOK</h2>
+            <p className="mt-2 font-jost text-sm text-brand-muted">Scroll the inspo board — curated looks on the runway.</p>
+          </div>
+          <Link
+            href="/runway"
+            className="rounded-xl border border-brand-pink bg-[var(--surface-card-soft)] px-5 py-2.5 font-jost text-sm font-semibold text-brand-text transition-colors hover:bg-brand-pink-muted"
+          >
+            Open runway →
+          </Link>
+        </div>
         <div className="mt-8 flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory md:snap-none">
           {shots.map((s, i) => (
             <motion.div
@@ -26,12 +36,12 @@ export function LookbookStrip() {
               whileHover={{ scale: 1.03 }}
               transition={{ duration: 0.35 }}
             >
-              <Link href={`/product/${s.slug}`} className="group block">
+              <Link href="/runway" className="group block">
                 <div className="relative aspect-square overflow-hidden rounded-lg bg-brand-elevated">
                   <Image src={s.src} alt={s.caption} fill className="object-cover" sizes="280px" />
                   <div className="absolute inset-0 flex flex-col justify-end bg-[rgba(0,0,0,0)] p-4 opacity-0 transition-opacity duration-300 group-hover:bg-[rgba(0,0,0,0.45)] group-hover:opacity-100">
                     <p className="font-playfair text-white">{s.caption}</p>
-                    <p className="mt-1 font-jost text-xs text-white/90">Shop this look →</p>
+                    <p className="mt-1 font-jost text-xs text-white/90">See on runway →</p>
                   </div>
                 </div>
               </Link>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ColorSwatchDot } from "@/components/storefront/ColorSwatch";
 import { choice } from "@/lib/choiceStyles";
+import type { RunwayOutfitPost } from "@/lib/runway.server";
 import type { CatalogProduct } from "@/types/product";
 
 const CATS: { id: string; label: string; match: (p: CatalogProduct) => boolean }[] = [
@@ -23,7 +24,54 @@ function collectColors(products: CatalogProduct[]) {
   return Array.from(s).sort();
 }
 
-export function RunwayCatalog({ products }: { products: CatalogProduct[] }) {
+function RunwayOutfitCard({ post, products }: { post: RunwayOutfitPost; products: CatalogProduct[] }) {
+  const resolved = post.productIds
+    .map((id) => products.find((p) => p.id === id))
+    .filter((p): p is CatalogProduct => Boolean(p));
+  const img = post.heroImageUrl?.trim() || resolved[0]?.images[0]?.url || "";
+  return (
+    <article className="mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-[var(--border-pink)] bg-[var(--surface-card)] shadow-sm">
+      {img ? (
+        <div className="relative aspect-[4/3] w-full">
+          <Image src={img} alt={post.title} fill className="object-cover" sizes="(max-width:768px) 100vw, 50vw" />
+        </div>
+      ) : null}
+      <div className="space-y-2 p-4">
+        <p className="font-bebas text-xs tracking-[0.25em] text-brand-pink">CURATED SET</p>
+        <h2 className="font-playfair text-lg text-brand-text">{post.title}</h2>
+        {post.subtitle?.trim() ? (
+          <p className="font-jost text-xs text-brand-muted">{post.subtitle}</p>
+        ) : null}
+        <p className="font-jost text-sm font-semibold text-brand-pink">Outfit bundle · GHS {post.bundlePriceGhs}</p>
+        {resolved.length ? (
+          <ul className="mt-2 space-y-1 border-t border-brand-border/60 pt-2">
+            {resolved.map((p) => {
+              const unit = p.sale_price ?? p.price;
+              return (
+                <li key={p.id} className="font-jost text-xs">
+                  <Link href={`/product/${p.slug}`} className="text-brand-text underline-offset-2 hover:text-brand-pink hover:underline">
+                    {p.name}
+                  </Link>
+                  <span className="text-brand-muted"> · GHS {unit}</span>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className="font-jost text-[11px] text-brand-muted">Link products by UUID in Hub so each piece appears here.</p>
+        )}
+      </div>
+    </article>
+  );
+}
+
+export function RunwayCatalog({
+  products,
+  outfitPosts = [],
+}: {
+  products: CatalogProduct[];
+  outfitPosts?: RunwayOutfitPost[];
+}) {
   const all = products;
   const palette = useMemo(() => collectColors(all), [all]);
 
@@ -118,6 +166,19 @@ export function RunwayCatalog({ products }: { products: CatalogProduct[] }) {
       </div>
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+        {outfitPosts.length > 0 ? (
+          <section className="mb-12">
+            <h2 className="font-bebas text-xl tracking-wide text-brand-pink">CURATED OUTFITS</h2>
+            <p className="mt-1 font-jost text-sm text-brand-muted">
+              Full looks styled by the team — tap through to shop each piece.
+            </p>
+            <div className="mt-6 columns-1 gap-4 sm:columns-2 lg:columns-3">
+              {outfitPosts.map((post) => (
+                <RunwayOutfitCard key={post.id} post={post} products={products} />
+              ))}
+            </div>
+          </section>
+        ) : null}
         {filtered.length === 0 ? (
           <p className="text-center font-jost text-brand-muted">No pieces match — try another search.</p>
         ) : (

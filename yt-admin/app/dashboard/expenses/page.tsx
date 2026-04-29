@@ -127,7 +127,8 @@ export default async function ExpensesPage({
 
         <section>
           <h2 className="text-sm font-semibold text-stone-900 dark:text-stone-100">Recent entries</h2>
-          <div className="mt-3 overflow-x-auto rounded-xl border border-stone-200 dark:border-stone-700">
+          <div className="-mx-4 mt-3 overflow-x-auto sm:mx-0">
+            <div className="min-w-full overflow-hidden rounded-xl border border-stone-200 dark:border-stone-700">
             <table className="w-full min-w-[640px] text-left text-sm">
               <thead className="bg-stone-100 dark:bg-stone-800">
                 <tr>
@@ -165,6 +166,7 @@ export default async function ExpensesPage({
                   : null}
               </tbody>
             </table>
+            </div>
           </div>
         </section>
       </main>
