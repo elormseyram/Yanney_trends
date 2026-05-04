@@ -40,7 +40,7 @@ export function FavoritesView({ catalog }: FavoritesViewProps) {
                 Your Wishlist
               </h1>
               <p className="mt-4 max-w-xl font-jost text-sm text-brand-muted">
-                The pieces you've saved for later. Ready to make them yours?
+                The pieces you have saved for later. Ready to make them yours❤️?
               </p>
             </div>
             {favoriteProducts.length > 0 ? (
