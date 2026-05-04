@@ -28,10 +28,12 @@ export async function updateOrderStatus(formData: FormData): Promise<void> {
   }
 
   const supabase = await createClient();
-  const { error } = await supabase
+  const { data: order, error } = await supabase
     .from("orders")
     .update({ status, updated_at: new Date().toISOString() })
-    .eq("id", orderId);
+    .eq("id", orderId)
+    .select("order_number, customer_name, customer_phone")
+    .single();
 
   if (error) {
     const target = redirectToRaw
@@ -39,6 +41,21 @@ export async function updateOrderStatus(formData: FormData): Promise<void> {
       : `/dashboard/orders/${orderId}`;
     const sep = target.includes("?") ? "&" : "?";
     redirect(`${target}${sep}err=${encodeURIComponent(error.message)}`);
+  }
+
+  // Trigger the SMS notification via the Storefront API
+  if (order?.customer_phone) {
+    const webUrl = process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3001";
+    await fetch(`${webUrl}/api/admin/notify-status`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        order_number: order.order_number,
+        customer_name: order.customer_name || "Customer",
+        customer_phone: order.customer_phone,
+        status: status,
+      }),
+    }).catch((err) => console.error("[SMS Trigger] Failed to ping storefront:", err));
   }
 
   revalidatePath("/dashboard/orders");
