@@ -1,4 +1,4 @@
--- Yanney Trends — enums from YANNEY_TRENDS_MASTER_CURSOR_PROMPT.md (+ app extras)
+-- Yanney Trendss — enums from YANNEY_TRENDS_MASTER_CURSOR_PROMPT.md (+ app extras)
 -- Run after 20250403190000_core.sql (hub_role stays separate for Yanney Hub).
 
 -- Optional legacy enum if you add admin_users later

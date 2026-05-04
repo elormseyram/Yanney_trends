@@ -1,6 +1,6 @@
 # Yanney Hub (`yt-admin`)
 
-Admin and **owner** workspaces for Yanney Trends. Pair it with the storefront in `yt-web`.
+Admin and **owner** workspaces for Yanney Trendss. Pair it with the storefront in `yt-web`.
 
 ## Run locally
 

@@ -47,7 +47,7 @@ export function CheckoutInvoice({
       style={{ perspective: 1200 }}
     >
       <div className="absolute -right-1 -top-1 h-16 w-16 rounded-bl-full bg-brand-pink/25 print:hidden" aria-hidden />
-      <p className="font-bebas text-xs tracking-[0.4em] text-brand-pink">YANNEY TRENDS</p>
+      <p className="font-bebas text-xs tracking-[0.4em] text-brand-pink">Yanney Trendss</p>
       <h2 className="mt-2 font-playfair text-2xl text-brand-text">Order receipt</h2>
       <p className="mt-1 font-jost text-xs text-brand-muted">Bring this to the shop as proof of purchase (demo).</p>
 
@@ -153,7 +153,7 @@ export function CheckoutInvoice({
       </div>
 
       <p className="mt-6 text-center font-jost text-[10px] text-brand-dimmed">
-        Thank you — Yanney Trends · Dansoman, Accra
+        Thank you — Yanney Trendss · Dansoman, Accra
       </p>
     </motion.div>
   );

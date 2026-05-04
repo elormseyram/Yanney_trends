@@ -1,4 +1,4 @@
--- Yanney Trends: gift orders, recipients, self-arranged rider metadata
+-- Yanney Trendss: gift orders, recipients, self-arranged rider metadata
 -- Run in Supabase: SQL Editor → New query → paste → Run
 -- Prerequisite: public.orders must already exist (your storefront order schema).
 

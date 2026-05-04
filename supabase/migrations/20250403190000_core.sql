@@ -1,4 +1,4 @@
--- Yanney Trends — core tables shared by yt-web (storefront) and yt-admin (hub).
+-- Yanney Trendss — core tables shared by yt-web (storefront) and yt-admin (hub).
 -- Apply in Supabase: SQL Editor → New query → paste → Run
 -- Or: supabase db push (if using Supabase CLI linked to this project)
 
@@ -71,7 +71,7 @@ create policy "site_config_public_read"
 insert into public.site_config (key, value)
 values
   ('health', '{"status": "ok"}'::jsonb),
-  ('storefront_meta', '{"name": "Yanney Trends", "tagline": "Style that speaks before you do"}'::jsonb)
+  ('storefront_meta', '{"name": "Yanney Trendss", "tagline": "Style that speaks before you do"}'::jsonb)
 on conflict (key) do update set
   value = excluded.value,
   updated_at = now();

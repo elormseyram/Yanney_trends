@@ -27,7 +27,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl border-t border-brand-border px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           <div>
-            <p className="font-playfair text-lg text-brand-text">Yanney Trends</p>
+            <p className="font-playfair text-lg text-brand-text">Yanney Trendss</p>
             <p className="mt-2 font-jost text-sm text-brand-muted">
               Style that speaks before you do — luxury fashion, Ghana-first service.
             </p>
@@ -87,7 +87,7 @@ export function Footer() {
             <p className="font-bebas text-xs tracking-widest text-brand-muted">TERMS</p>
             <p className="mt-2 font-jost text-xs leading-relaxed text-brand-dimmed">
               By using this site you agree to our order, delivery, and returns policies. Full order
-              terms appear before payment. Yanney Trends may update these terms; continued use
+              terms appear before payment. Yanney Trendss may update these terms; continued use
               constitutes acceptance.
             </p>
           </div>
@@ -101,7 +101,7 @@ export function Footer() {
         </div>
 
         <p className="mt-10 border-t border-brand-border pt-8 text-center font-jost text-xs text-brand-dimmed">
-          © {new Date().getFullYear()} Yanney Trends · Website by {SITE_CREDIT.name} · WhatsApp{" "}
+          © {new Date().getFullYear()} Yanney Trendss · Website by {SITE_CREDIT.name} · WhatsApp{" "}
           <a href={SHOP_WHATSAPP_CHAT_URL} className="hover:text-brand-pink" target="_blank" rel="noreferrer">
             {formatGhSpaced(SHOP_WHATSAPP)}
           </a>{" "}

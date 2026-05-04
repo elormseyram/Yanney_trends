@@ -28,7 +28,7 @@ export function RecentlyViewed({
           p ? (
             <Link
               key={p.id}
-              href={`/product/${p.slug}`}
+              href={`/product/${p.slug || p.id}`}
               className="w-28 shrink-0"
             >
               <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-brand-elevated">

@@ -45,7 +45,7 @@ export default function FindUsPage() {
         </div>
         <div className="aspect-video w-full min-h-[220px] overflow-hidden rounded-xl border border-brand-border">
           <iframe
-            title="Yanney Trends location"
+            title="Yanney Trendss location"
             className="h-full min-h-[220px] w-full border-0"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"

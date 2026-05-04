@@ -85,7 +85,7 @@ export default function HubSidebar({ role }: { role: HubSidebarRole }) {
         <div className="flex items-center justify-between border-b border-stone-200 p-4 dark:border-stone-800">
           <div>
             <p className="font-semibold tracking-tight text-stone-900 dark:text-stone-100">
-              Yanney Trends
+              Yanney Trendss
             </p>
             <p className="text-xs text-stone-500 dark:text-stone-400">
               {role === "owner" ? "Owner" : "Admin"}

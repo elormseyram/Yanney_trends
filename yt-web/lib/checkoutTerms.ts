@@ -23,7 +23,7 @@ export const CHECKOUT_TERMS_SECTIONS = [
   },
   {
     title: "Limitation",
-    body: `To the extent permitted by law, Yanney Trends is not liable for indirect or consequential loss. Nothing in these terms limits liability for death, personal injury caused by negligence, or fraud.`,
+    body: `To the extent permitted by law, Yanney Trendss is not liable for indirect or consequential loss. Nothing in these terms limits liability for death, personal injury caused by negligence, or fraud.`,
   },
 ] as const;
 

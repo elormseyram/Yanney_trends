@@ -12,17 +12,17 @@ export const revalidate = 60;
 
 export async function generateStaticParams() {
   const catalog = await getCatalogProducts();
-  return catalog.map((p) => ({ slug: p.slug }));
+  return catalog.map((p) => ({ slug: p.slug || p.id }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const catalog = await getCatalogProducts();
   const p = findProductInCatalog(catalog, slug);
-  if (!p) return { title: "Product — Yanney Trends" };
-  const desc = (p.cardSubtitle ?? p.description).trim().slice(0, 160) || p.name;
+  if (!p) return { title: "Product — Yanney Trendss" };
+  const desc = (p.cardSubtitle ?? p.description ?? "").trim().slice(0, 160) || p.name;
   return {
-    title: `${p.name} — Yanney Trends`,
+    title: `${p.name} — Yanney Trendss`,
     description: desc,
   };
 }

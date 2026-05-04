@@ -146,7 +146,7 @@ function PaymentSummaryStrip() {
           Payment received
         </p>
         <p className="font-jost text-xs text-emerald-800/80 dark:text-emerald-200/80">
-          Your order is confirmed. We&apos;ll be in touch by WhatsApp.
+          Your order is confirmed. We&apos;ll be in touch via email or SMS. You can also track your order on the order tracker below.
         </p>
       </div>
     </motion.div>

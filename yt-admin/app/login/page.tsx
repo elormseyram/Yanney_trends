@@ -30,7 +30,7 @@ export default async function LoginPage({
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#fdf8fa] px-4 dark:bg-stone-950">
       <div className="w-full max-w-md rounded-2xl border border-rose-200/80 bg-white p-8 shadow-sm dark:border-stone-800 dark:bg-stone-900">
         <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-rose-500">
-          Yanney Trends
+          Yanney Trendss
         </p>
         <h1 className="mt-2 text-center text-2xl font-semibold text-stone-900 dark:text-stone-100">
           Hub sign-in

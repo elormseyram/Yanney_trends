@@ -7,7 +7,7 @@ export function buildRiderInstructions(params: {
   return [
     `Deliver to: ${params.recipientName}`,
     `Call: ${params.recipientPhone}`,
-    "From: Yanney Trends",
+    "From: Yanney Trendss",
     `Order Ref: ${params.orderRef}`,
   ].join("\n");
 }

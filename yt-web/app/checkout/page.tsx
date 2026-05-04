@@ -295,7 +295,7 @@ export default function CheckoutPage() {
                     <input value={phone} onChange={(e) => setPhone(e.target.value)} className={softInput} />
                   </label>
                   <label className="block">
-                    <span className="font-jost text-xs text-brand-dimmed">Email (optional)</span>
+                    <span className="font-jost text-xs text-brand-dimmed">Email</span>
                     <input
                       type="email"
                       value={email}

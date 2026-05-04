@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Yanney Trends storefront — typography is intentionally unified on Poppins.
+ * Yanney Trendss storefront — typography is intentionally unified on Poppins.
  * Legacy utility names (`font-playfair`, `font-bebas`, `font-jost`) all
  * resolve to the Poppins variable so the existing component classes keep
  * working without an audit while we migrate to a single typeface.
@@ -24,7 +24,7 @@ const config: Config = {
     extend: {
       colors: {
         /**
-         * Yanney Trends design tokens.
+         * Yanney Trendss design tokens.
          * Surface, border, and ink colors point at CSS variables defined in
          * globals.css so they flip light/dark automatically when the `dark`
          * class is applied. Saturated brand colors (pink, status colors)

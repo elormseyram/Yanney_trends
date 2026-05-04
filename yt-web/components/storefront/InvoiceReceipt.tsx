@@ -119,7 +119,7 @@ export function InvoiceReceipt({ order }: { order: ReceiptOrder }) {
 
       <header className="flex items-start justify-between gap-3">
         <div>
-          <p className="font-bebas text-xs tracking-[0.4em] text-brand-pink">YANNEY TRENDS</p>
+          <p className="font-bebas text-xs tracking-[0.4em] text-brand-pink">Yanney Trendss</p>
           <h2 className="mt-1.5 font-playfair text-2xl text-brand-text">Order receipt</h2>
           <p className="mt-1 font-jost text-[11px] text-brand-muted">
             Dansoman, Accra · hello@yanneytrends.com
@@ -237,7 +237,7 @@ export function InvoiceReceipt({ order }: { order: ReceiptOrder }) {
       </dl>
 
       <p className="mt-7 text-center font-jost text-[10px] tracking-wide text-brand-dimmed">
-        Thank you for shopping with us — Yanney Trends · Dansoman, Accra
+        Thank you for shopping with us — Yanney Trendss · Dansoman, Accra
       </p>
     </article>
   );

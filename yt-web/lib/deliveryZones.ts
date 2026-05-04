@@ -1,4 +1,4 @@
-/** Yanney Trends boutique delivery — zone + rider fee (GHS) */
+/** Yanney Trendss boutique delivery — zone + rider fee (GHS) */
 
 export interface DeliveryZone {
   id: string;

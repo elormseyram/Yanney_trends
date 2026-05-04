@@ -49,7 +49,7 @@ function RunwayOutfitCard({ post, products }: { post: RunwayOutfitPost; products
               const unit = p.sale_price ?? p.price;
               return (
                 <li key={p.id} className="font-jost text-xs">
-                  <Link href={`/product/${p.slug}`} className="text-brand-text underline-offset-2 hover:text-brand-pink hover:underline">
+                  <Link href={`/product/${p.slug || p.id}`} className="text-brand-text underline-offset-2 hover:text-brand-pink hover:underline">
                     {p.name}
                   </Link>
                   <span className="text-brand-muted"> · GHS {unit}</span>
@@ -189,7 +189,7 @@ export function RunwayCatalog({
               return (
                 <Link
                   key={p.id}
-                  href={`/product/${p.slug}`}
+                  href={`/product/${p.slug || p.id}`}
                   className="mb-3 block break-inside-avoid rounded-xl border border-[var(--border-pink)] bg-[var(--surface-card)] shadow-sm transition hover:border-brand-pink/60 sm:mb-4"
                 >
                   <div className="relative aspect-[3/4] w-full overflow-hidden rounded-t-xl">

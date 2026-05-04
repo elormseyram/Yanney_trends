@@ -1,6 +1,6 @@
 /** Pickup address for self-arranged rider flows */
 export const SHOP_ADDRESS =
-  "Yanney Trends Boutique, Dansoman, Accra, Ghana";
+  "Yanney Trendss Boutique, Dansoman, Accra, Ghana";
 
 /** E.164 without + — WhatsApp & routing */
 export const SHOP_WHATSAPP = process.env.NEXT_PUBLIC_SHOP_WHATSAPP ?? "233546894821";

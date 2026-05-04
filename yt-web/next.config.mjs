@@ -23,7 +23,7 @@ function supabaseRemotePattern() {
 const nextConfig = {
   outputFileTracingRoot: path.join(__dirname),
   /** LAN dev (phone / hotspot) — avoids Next.js cross-origin warnings for `/_next/*`. */
-  allowedDevOrigins: ["172.20.10.2"],
+  allowedDevOrigins: ["192.168.100.19:3001"],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },

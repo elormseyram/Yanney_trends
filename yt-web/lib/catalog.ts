@@ -342,7 +342,13 @@ export function findProductInCatalog(
   catalog: CatalogProduct[],
   slug: string,
 ): CatalogProduct | undefined {
-  return catalog.find((p) => p.slug === slug);
+  if (!slug) return undefined;
+  const target = decodeURIComponent(slug).toLowerCase().trim();
+  return catalog.find((p) => {
+    const pSlug = p.slug ? p.slug.toLowerCase().trim() : "";
+    const pId = p.id ? p.id.toLowerCase().trim() : "";
+    return pSlug === target || pId === target;
+  });
 }
 
 /** Prefer featured items; if none, show the newest slice so DB-only shops still have a hero. */

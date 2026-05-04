@@ -52,7 +52,7 @@ create policy "Hub staff can manage products"
 -- ---------------------------------------------------------------------------
 create table if not exists public.shop_settings (
   id uuid primary key default gen_random_uuid(),
-  shop_name text not null default 'Yanney Trends',
+  shop_name text not null default 'Yanney Trendss',
   tagline text default 'Style That Speaks Before You Do',
   shop_address text,
   whatsapp_number text,
@@ -75,7 +75,7 @@ create table if not exists public.shop_settings (
 );
 
 insert into public.shop_settings (shop_name)
-select 'Yanney Trends'
+select 'Yanney Trendss'
 where not exists (select 1 from public.shop_settings limit 1);
 
 alter table public.shop_settings enable row level security;

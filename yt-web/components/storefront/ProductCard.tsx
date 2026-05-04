@@ -48,7 +48,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const unit = product.sale_price ?? product.price;
   const totalStock = product.sizes.reduce((n, s) => n + s.stock, 0);
   const defaultSize = product.sizes.find((s) => s.stock > 0)?.size ?? product.sizes[0]?.size ?? "M";
-  const href = `/product/${product.slug}`;
+  const href = `/product/${product.slug || product.id}`;
 
   const categoryLabel = product.category.replace(/_/g, " ");
   const metaLine = productCardMetaLine(product);

@@ -1,5 +1,5 @@
 -- =====================================================================
--- Yanney Trends — remediate legacy databases that contain SELF_RIDER
+-- Yanney Trendss — remediate legacy databases that contain SELF_RIDER
 -- =====================================================================
 -- The master spec defines public.fulfillment_type as exactly:
 --   ('PICKUP', 'DELIVERY', 'RIDER')

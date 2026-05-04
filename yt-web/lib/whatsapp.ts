@@ -7,7 +7,7 @@ export function buildWhatsAppOrderLink(
   shopPhone: string,
 ): string {
   const unit = product.sale_price ?? product.price;
-  const message = `Hello Yanney Trends 👗
+  const message = `Hello Yanney Trendss 👗
 
 I'd like to order:
 

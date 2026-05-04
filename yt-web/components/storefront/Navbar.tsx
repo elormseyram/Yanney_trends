@@ -122,7 +122,7 @@ export function Navbar() {
         <div className="flex items-center gap-1.5 sm:gap-2">
           <ThemeToggle />
           <Link
-            href="/shop"
+            href="/favorites"
             className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-transparent text-brand-muted transition-colors hover:border-brand-border hover:text-brand-pink"
             title="Saved pieces"
           >

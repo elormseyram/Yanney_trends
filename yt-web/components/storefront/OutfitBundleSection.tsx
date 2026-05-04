@@ -55,7 +55,7 @@ export function OutfitBundleSection({ products }: OutfitBundleSectionProps) {
         {products.map((p) => (
           <Link
             key={p.id}
-            href={`/product/${p.slug}`}
+            href={`/product/${p.slug || p.id}`}
             className="group w-[140px] shrink-0"
           >
             <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-brand-elevated">

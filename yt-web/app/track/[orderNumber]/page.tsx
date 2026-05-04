@@ -44,7 +44,7 @@ export default async function TrackPage({ params, searchParams }: TrackPageProps
   }
 
   const wa = buildWhatsAppPrefill(
-    `Hi Yanney Trends — question about order ${orderNumber}`,
+    `Hi Yanney Trendss — question about order ${orderNumber}`,
     SHOP_WHATSAPP,
   );
 
@@ -56,7 +56,7 @@ export default async function TrackPage({ params, searchParams }: TrackPageProps
     return (
       <div className="min-h-screen bg-brand-surface px-4 py-12 sm:px-6">
         <div className="mx-auto max-w-lg text-center">
-          <p className="font-playfair text-xl text-brand-text">Yanney Trends</p>
+          <p className="font-playfair text-xl text-brand-text">Yanney Trendss</p>
           <p className="mt-2 font-jost text-sm text-brand-muted">{orderNumber}</p>
         </div>
         <div className="mx-auto mt-8 max-w-lg">
@@ -93,7 +93,7 @@ export default async function TrackPage({ params, searchParams }: TrackPageProps
         <TrackOrderLookup initial={orderNumber} />
       </div>
       <div className="mx-auto mt-10 max-w-lg text-center">
-        <p className="font-playfair text-xl text-brand-text">Yanney Trends</p>
+        <p className="font-playfair text-xl text-brand-text">Yanney Trendss</p>
         {isSurprise ? (
           <>
             <p className="mt-6 flex items-center justify-center gap-2 font-playfair text-2xl text-brand-text">

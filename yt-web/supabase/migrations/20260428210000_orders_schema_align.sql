@@ -1,5 +1,5 @@
 -- =====================================================================
--- Yanney Trends — orders schema alignment (idempotent / safe to re-run)
+-- Yanney Trendss — orders schema alignment (idempotent / safe to re-run)
 -- =====================================================================
 -- The API in /api/paystack/initialize writes a wide row when a customer
 -- checks out. If your live database was created from an older baseline,

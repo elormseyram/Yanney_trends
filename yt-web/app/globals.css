@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /**
- * Yanney Trends design tokens
+ * Yanney Trendss design tokens
  * --------------------------------
  * Single source of truth for surface, border, and ink colors. The values
  * flip automatically when `html.dark` is applied, so any element styled

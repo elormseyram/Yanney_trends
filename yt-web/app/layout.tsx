@@ -20,7 +20,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Yanney Trends — Style That Speaks Before You Do",
+  title: "Yanney Trendss — Style That Speaks Before You Do",
   description: "Luxury fashion boutique — Dansoman, Accra, Ghana.",
 };
 
