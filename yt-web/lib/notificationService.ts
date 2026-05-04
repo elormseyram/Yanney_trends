@@ -39,7 +39,7 @@ function buildSMSMessage(order: OrderNotificationPayload, status: OrderStatusLit
   const trackUrl = `${siteUrl}/track/${order.order_number}`;
 
   if (status === "CONFIRMED" || status === "PENDING") {
-    let msg = `Hi ${order.customer_name}! Thank you for your purchase. We hope you enjoy your order and please do well to keep track of your status on the website as well.`;
+    let msg = `Hi ${order.customer_name}! Thank you for your purchase. We hope you love your order and please do well to keep track of your status on the website as well.`;
 
     if (order.total != null) {
       msg += `\nTotal: ${order.currency || "GHS"} ${Number(order.total).toFixed(2)}`;
@@ -59,7 +59,7 @@ function buildSMSMessage(order: OrderNotificationPayload, status: OrderStatusLit
   // For all other statuses (PACKAGED, RIDER_ASSIGNED, OUT_FOR_DELIVERY, etc.)
   // Automatically converts "OUT_FOR_DELIVERY" to "out for delivery"
   const formattedStatus = status.replace(/_/g, " ").toLowerCase();
-  return `Hello ${order.customer_name}, your Yanney Trendss order ${order.order_number} is now ${formattedStatus}.\nTrack: ${trackUrl}`;
+  return `Hello ${order.customer_name}, your order ${order.order_number} is now ${formattedStatus}.\nTrack: ${trackUrl}`;
 }
 
 async function sendSMS(order: OrderNotificationPayload, status: OrderStatusLite) {

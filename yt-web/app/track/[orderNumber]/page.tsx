@@ -67,6 +67,16 @@ export default async function TrackPage({ params, searchParams }: TrackPageProps
             surprise={isSurprise}
           />
         </div>
+        <div className="mx-auto mt-10 max-w-lg">
+          <OrderTracker
+            fulfillment={fulfillment}
+            currentStatus={currentStatus}
+            surprise={isSurprise}
+          />
+        </div>
+        <div className="mx-auto mt-10 max-w-lg">
+          <InvoiceReceipt order={order} />
+        </div>
         <div className="mx-auto mt-8 max-w-lg space-y-4 font-jost text-sm">
           <a
             href={wa}
