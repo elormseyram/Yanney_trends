@@ -25,7 +25,6 @@ export async function POST(req: Request) {
       status?: string;
       amount?: number;
       customer?: { first_name?: string; phone?: string; email?: string };
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       metadata?: any;
     };
   };
@@ -34,7 +33,7 @@ export async function POST(req: Request) {
 
   const admin = createAdminClient();
   if (event.event === "charge.success" || event.data?.status === "success") {
-    await materializePaidOrderFromIntent(admin, reference);
+    const order = await materializePaidOrderFromIntent(admin, reference);
     await admin
       .from("checkout_payment_intents")
       .update({ status: "PAID", paid_at: new Date().toISOString(), paystack_reference: reference })

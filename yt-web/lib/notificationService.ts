@@ -22,6 +22,7 @@ export interface OrderNotificationPayload {
   customer_email?: string | null;
   total?: number | null;
   currency?: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   items?: any[];
 }
 
@@ -45,6 +46,7 @@ function buildSMSMessage(order: OrderNotificationPayload, status: OrderStatusLit
     }
     if (order.items && order.items.length > 0) {
       // Map items to a short format (e.g. "1x Dress, 2x Bag")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const itemNames = order.items.map((i: any) => `${i.quantity || 1}x ${i.name || "Item"}`);
       let itemsStr = itemNames.join(", ");
       if (itemsStr.length > 60) itemsStr = itemsStr.substring(0, 57) + "...";

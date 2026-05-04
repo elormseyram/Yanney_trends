@@ -22,6 +22,7 @@ export function HangerCartIcon({ onClick }: { onClick: () => void }) {
     const t = window.setTimeout(() => setCartPulse(false), 550);
     return () => clearTimeout(t);
     // Only when a new item is added — do not list `swing`; its identity can change every render and retrigger this effect (infinite updates).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastAddedAt]);
 
   return (

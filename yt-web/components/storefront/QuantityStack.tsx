@@ -26,6 +26,7 @@ export function QuantityStack({ productImageUrl, productName, quantity }: Quanti
       transition: { duration: 0.65, ease: "easeInOut" },
     });
     // `swing` from useAnimation must not be a dependency — unstable reference reruns this effect every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quantity]);
 
   const layers = Math.min(quantity, 5);
