@@ -11,6 +11,7 @@ const DELIVERY_FLOW = [
   "RIDER_ASSIGNED",
   "OUT_FOR_DELIVERY",
   "DELIVERED",
+  "REFUNDED",
 ] as const;
 
 const PICKUP_FLOW = [

@@ -5,7 +5,7 @@ import { InvoiceReceipt, type ReceiptOrder } from "@/components/storefront/Invoi
 import { PaymentSuccessReveal } from "@/components/storefront/PaymentSuccessReveal";
 import { buildWhatsAppPrefill } from "@/lib/whatsapp";
 import { SHOP_WHATSAPP } from "@/lib/constants";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -20,28 +20,18 @@ export default async function TrackPage({ params, searchParams }: TrackPageProps
   const { surprise, paid } = await searchParams;
   const isSurprise = surprise === "1";
   const paidState = paid === "1" ? "success" : paid === "0" ? "failed" : null;
-  const supabase = await createClient();
-  const fullSelect =
-    "order_number, fulfillment_type, status, items, payment_status, payment_method, customer_name, customer_phone, customer_email, delivery_address, scheduled_date, scheduled_slot, is_gift_order, subtotal, delivery_fee, discount_amount, total, currency, created_at";
-  const safeSelect =
-    "order_number, fulfillment_type, status, items, payment_status, customer_name, subtotal, delivery_fee, discount_amount, total, currency, created_at";
+  
+  // Use the admin client to bypass RLS so unauthenticated guests can track their order
+  const supabase = createAdminClient();
 
-  let order: ReceiptOrder | null = null;
-  const fullResult = await supabase
+  const { data, error } = await supabase
     .from("orders")
-    .select(fullSelect)
+    .select("*")
     .eq("order_number", orderNumber)
     .maybeSingle();
-  if (fullResult.data) {
-    order = fullResult.data as unknown as ReceiptOrder;
-  } else if (fullResult.error) {
-    const safeResult = await supabase
-      .from("orders")
-      .select(safeSelect)
-      .eq("order_number", orderNumber)
-      .maybeSingle();
-    order = (safeResult.data as unknown as ReceiptOrder | null) ?? null;
-  }
+
+  if (error) console.error("[Track] Supabase error fetching order:", error.message);
+  const order = data as unknown as ReceiptOrder | null;
 
   const wa = buildWhatsAppPrefill(
     `Hi Yanney Trendss — question about order ${orderNumber}`,
@@ -66,16 +56,6 @@ export default async function TrackPage({ params, searchParams }: TrackPageProps
             currentStatus={currentStatus}
             surprise={isSurprise}
           />
-        </div>
-        <div className="mx-auto mt-10 max-w-lg">
-          <OrderTracker
-            fulfillment={fulfillment}
-            currentStatus={currentStatus}
-            surprise={isSurprise}
-          />
-        </div>
-        <div className="mx-auto mt-10 max-w-lg">
-          <InvoiceReceipt order={order} />
         </div>
         <div className="mx-auto mt-8 max-w-lg space-y-4 font-jost text-sm">
           <a
