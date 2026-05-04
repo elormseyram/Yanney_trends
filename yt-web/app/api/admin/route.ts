@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     }, status as OrderStatusLite);
 
     return NextResponse.json({ success: true, message: `Notification sent for status: ${status}` });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to send notification" }, { status: 500 });
   }
 }
