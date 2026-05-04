@@ -35,11 +35,11 @@ function normalizeGhanaPhone(phone: string): string {
 }
 
 function buildSMSMessage(order: OrderNotificationPayload, status: OrderStatusLite): string {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://yanneytrends.com";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://yanneytrendss.vercel.app";
   const trackUrl = `${siteUrl}/track/${order.order_number}`;
 
   if (status === "CONFIRMED" || status === "PENDING") {
-    let msg = `Hi ${order.customer_name}❤️! Thank you for your purchase. We hope you enjoy your order and please do well to keep track of your status on the website as well.`;
+    let msg = `Hi ${order.customer_name}! Thank you for your purchase. We hope you enjoy your order and please do well to keep track of your status on the website as well.`;
 
     if (order.total != null) {
       msg += `\nTotal: ${order.currency || "GHS"} ${Number(order.total).toFixed(2)}`;
