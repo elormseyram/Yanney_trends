@@ -23,7 +23,7 @@ function OrderHistoryItem({ order }: { order: ReceiptOrder }) {
 }
 
 export default async function OrderHistoryPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
@@ -60,7 +60,8 @@ export default async function OrderHistoryPage() {
         
         {orders && orders.length > 0 ? (
             <div className="mt-8 space-y-4">
-                {orders.map(order => (
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                {orders.map((order: any) => (
                     <OrderHistoryItem key={order.id} order={order as unknown as ReceiptOrder} />
                 ))}
             </div>

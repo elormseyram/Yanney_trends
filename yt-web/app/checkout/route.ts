@@ -3,26 +3,23 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { phone, token } = await req.json();
-
-    if (!phone || !token) {
-      return NextResponse.json({ error: "Phone and token are required" }, { status: 400 });
+    const { phone } = await req.json();
+    if (!phone) {
+      return NextResponse.json({ error: "Phone number is required" }, { status: 400 });
     }
 
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.verifyOtp({
+    const supabase = await createClient();
+    const { error } = await supabase.auth.signInWithOtp({
       phone,
-      token,
-      type: "sms",
     });
 
-    if (error || !data.session) {
-      return NextResponse.json({ error: "Invalid or expired OTP." }, { status: 400 });
+    if (error) {
+      console.error("Error sending OTP:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // On success, `data.session` will be non-null and a session cookie is set.
-    return NextResponse.json({ success: true, session: data.session });
+    return NextResponse.json({ success: true, message: "OTP sent successfully." });
   } catch (error) {
-    return NextResponse.json({ error: "Failed to verify OTP" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to send OTP" }, { status: 500 });
   }
 }
