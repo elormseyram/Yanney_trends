@@ -6,7 +6,7 @@ type Payload = {
   order_number: string;
   customer_name: string;
   customer_phone: string;
-  customer_email?: string | null;
+  customer_email: string;
   fulfillment_type: "PICKUP" | "DELIVERY";
   delivery_address?: string | null;
   delivery_zone?: string | null;
@@ -27,22 +27,18 @@ type Payload = {
   recipient_phone?: string | null;
   recipient_city?: string | null;
   recipient_address?: string | null;
+  user_id?: string | null;
 };
-
-function fallbackEmail(phone: string, orderRef: string) {
-  const clean = phone.replace(/\D/g, "");
-  return `order-${orderRef}-${clean || "guest"}@yanney.local`;
-}
 
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as Payload;
-    if (!body.order_number || !body.customer_name || !body.customer_phone || !Array.isArray(body.items)) {
+    if (!body.order_number || !body.customer_name || !body.customer_phone || !body.customer_email || !Array.isArray(body.items)) {
       return NextResponse.json({ ok: false, message: "Missing required order fields." }, { status: 400 });
     }
 
     const admin = createAdminClient();
-    const customerEmail = body.customer_email?.trim() || fallbackEmail(body.customer_phone, body.order_number);
+    const customerEmail = body.customer_email.trim();
     const total = Number(body.total ?? 0);
     const subtotal = Number(body.subtotal ?? 0);
     const deliveryFee = Number(body.delivery_fee ?? 0);
@@ -53,13 +49,13 @@ export async function POST(req: Request) {
         reference: body.order_number,
         amount_pesewas: Math.round(total * 100),
         currency,
-        customer_email: body.customer_email?.trim() || customerEmail,
+        customer_email: customerEmail,
         status: "INITIATED",
         payload: {
           order_number: body.order_number,
           customer_name: body.customer_name.trim(),
           customer_phone: body.customer_phone.trim(),
-          customer_email: body.customer_email?.trim() || null,
+          customer_email: customerEmail,
           fulfillment_type: body.fulfillment_type,
           items: body.items,
           subtotal,
@@ -79,6 +75,7 @@ export async function POST(req: Request) {
           recipient_phone: body.recipient_phone?.trim() || null,
           recipient_city: body.recipient_city?.trim() || null,
           recipient_address: body.recipient_address?.trim() || null,
+          user_id: body.user_id || null,
         },
       },
       { onConflict: "reference" },

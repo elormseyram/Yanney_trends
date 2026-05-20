@@ -12,6 +12,8 @@ export type ReceiptOrder = {
   delivery_address?: string | null;
   scheduled_date?: string | null;
   scheduled_slot?: string | null;
+  schedule_status?: string | null;
+  schedule_decision_note?: string | null;
   is_gift_order?: boolean | null;
   payment_method?: string | null;
   items: unknown;

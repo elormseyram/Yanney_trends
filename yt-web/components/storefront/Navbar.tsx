@@ -110,6 +110,10 @@ export function Navbar() {
             <IconSpark className="h-4 w-4 opacity-80" />
             Style me
           </Link>
+          <Link href="/account/orders" className={navLink}>
+            <IconUser className="h-4 w-4 opacity-80" />
+            My Orders
+          </Link>
           <Link href="/runway" className={navLink}>
             <IconInspo className="h-4 w-4 opacity-80" />
             Inspo

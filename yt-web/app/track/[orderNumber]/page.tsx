@@ -109,6 +109,13 @@ export default async function TrackPage({ params, searchParams }: TrackPageProps
             <p className="mt-2 font-jost text-sm text-brand-muted">{orderNumber}</p>
           </>
         )}
+
+        {order?.schedule_decision_note ? (
+          <div className="mx-auto mt-6 max-w-md rounded-xl border border-brand-pink/30 bg-brand-pink/5 p-4 text-left text-sm text-brand-text">
+            <p className="font-semibold text-brand-pink">Message regarding your schedule:</p>
+            <p className="mt-1 font-jost text-brand-muted">{order.schedule_decision_note}</p>
+          </div>
+        ) : null}
       </div>
       <div className="mx-auto mt-10 max-w-lg">
         {paidState === "failed" && order?.payment_status !== "PAID" ? (
