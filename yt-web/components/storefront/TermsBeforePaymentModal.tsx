@@ -3,15 +3,25 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CHECKOUT_TERMS_SECTIONS } from "@/lib/checkoutTerms";
+import { createClient } from "@/lib/supabase/client";
 
 interface TermsBeforePaymentModalProps {
   open: boolean;
   phone: string;
+  email: string;
+  name: string;
   onClose: () => void;
   onAccept: () => void;
 }
 
-export function TermsBeforePaymentModal({ open, phone, onClose, onAccept }: TermsBeforePaymentModalProps) {
+export function TermsBeforePaymentModal({
+  open,
+  phone,
+  email,
+  name,
+  onClose,
+  onAccept,
+}: TermsBeforePaymentModalProps) {
   const [agree, setAgree] = useState(false);
   const [step, setStep] = useState<"terms" | "otp">("terms");
   const [otp, setOtp] = useState("");
@@ -54,10 +64,20 @@ export function TermsBeforePaymentModal({ open, phone, onClose, onAccept }: Term
       const res = await fetch("/api/auth/otp/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, token: otp.trim() }),
+        body: JSON.stringify({ phone, token: otp.trim(), email, name }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Invalid code. Please try again.");
+
+      // Exchange token_hash for a browser session so the user can view order history
+      if (data.token_hash) {
+        const supabase = createClient();
+        await supabase.auth.verifyOtp({
+          token_hash: data.token_hash,
+          type: "magiclink",
+        });
+      }
+
       onAccept();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Verification failed.");
@@ -114,7 +134,6 @@ export function TermsBeforePaymentModal({ open, phone, onClose, onAccept }: Term
 
               {step === "terms" && (
                 <>
-                  {/* Terms scroll */}
                   <div className="mt-4 rounded-xl border border-brand-pink/30 bg-brand-elevated/80 p-3 sm:p-4">
                     <div className="space-y-3 sm:space-y-4">
                       {CHECKOUT_TERMS_SECTIONS.map((sec) => (
@@ -144,9 +163,7 @@ export function TermsBeforePaymentModal({ open, phone, onClose, onAccept }: Term
                       </span>
                     </label>
 
-                    {error && (
-                      <p className="font-jost text-sm text-red-500">{error}</p>
-                    )}
+                    {error && <p className="font-jost text-sm text-red-500">{error}</p>}
 
                     <button
                       type="button"
@@ -154,7 +171,7 @@ export function TermsBeforePaymentModal({ open, phone, onClose, onAccept }: Term
                       onClick={handleSendOtp}
                       className="w-full rounded-xl border border-brand-pink bg-brand-pink py-3 font-jost text-xs font-semibold uppercase tracking-[0.12em] text-white transition hover:bg-brand-pink-hover disabled:cursor-not-allowed disabled:opacity-40"
                     >
-                      {loading ? "Sending..." : `Send OTP to ${phone}`}
+                      {loading ? "Sending..." : `Send code to ${phone}`}
                     </button>
                     <button
                       type="button"
@@ -170,33 +187,33 @@ export function TermsBeforePaymentModal({ open, phone, onClose, onAccept }: Term
               {step === "otp" && (
                 <div className="mt-5 space-y-4">
                   <p className="font-jost text-sm text-brand-muted">
-                    We sent a code to <span className="font-semibold text-brand-text">{phone}</span>.
-                    Enter it below to confirm your order.
+                    We sent a 6-digit code to{" "}
+                    <span className="font-semibold text-brand-text">{phone}</span>. Enter it below
+                    to confirm your order.
                   </p>
 
                   <label className="block">
                     <span className="font-jost text-[10px] font-medium uppercase tracking-wider text-brand-dimmed">
-                      One-time code
+                      Verification code
                     </span>
                     <input
                       type="text"
                       inputMode="numeric"
                       autoComplete="one-time-code"
                       value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
+                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
                       placeholder="123456"
                       className={inputCls}
+                      // eslint-disable-next-line jsx-a11y/no-autofocus
                       autoFocus
                     />
                   </label>
 
-                  {error && (
-                    <p className="font-jost text-sm text-red-500">{error}</p>
-                  )}
+                  {error && <p className="font-jost text-sm text-red-500">{error}</p>}
 
                   <button
                     type="button"
-                    disabled={!otp.trim() || loading}
+                    disabled={otp.length < 6 || loading}
                     onClick={handleVerifyOtp}
                     className="w-full rounded-xl border border-brand-pink bg-brand-pink py-3 font-jost text-xs font-semibold uppercase tracking-[0.12em] text-white transition hover:bg-brand-pink-hover disabled:cursor-not-allowed disabled:opacity-40"
                   >
@@ -205,7 +222,11 @@ export function TermsBeforePaymentModal({ open, phone, onClose, onAccept }: Term
 
                   <button
                     type="button"
-                    onClick={() => { setStep("terms"); setError(null); }}
+                    onClick={() => {
+                      setStep("terms");
+                      setError(null);
+                      setOtp("");
+                    }}
                     className="w-full rounded-lg py-2 font-jost text-xs text-brand-muted hover:text-brand-text"
                   >
                     Resend code

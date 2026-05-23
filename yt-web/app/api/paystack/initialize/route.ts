@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { initializePaystackPayment } from "@/lib/paystack";
 
 type Payload = {
@@ -36,6 +37,11 @@ export async function POST(req: Request) {
     if (!body.order_number || !body.customer_name || !body.customer_phone || !body.customer_email || !Array.isArray(body.items)) {
       return NextResponse.json({ ok: false, message: "Missing required order fields." }, { status: 400 });
     }
+
+    // Read authenticated user from session cookie (set after OTP verification)
+    const supabase = await createClient();
+    const { data: { user: sessionUser } } = await supabase.auth.getUser();
+    const userId = sessionUser?.id ?? body.user_id ?? null;
 
     const admin = createAdminClient();
     const customerEmail = body.customer_email.trim();
@@ -75,7 +81,7 @@ export async function POST(req: Request) {
           recipient_phone: body.recipient_phone?.trim() || null,
           recipient_city: body.recipient_city?.trim() || null,
           recipient_address: body.recipient_address?.trim() || null,
-          user_id: body.user_id || null,
+          user_id: userId,
         },
       },
       { onConflict: "reference" },
