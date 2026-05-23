@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true, message: "Phone number verified successfully." });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to verify OTP" }, { status: 500 });
   }
 }

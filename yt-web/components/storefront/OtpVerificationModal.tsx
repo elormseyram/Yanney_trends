@@ -34,8 +34,8 @@ export function OtpVerificationModal({ open, phone, onClose, onSuccess }: OtpVer
             throw new Error(data.error || "Failed to send OTP. Please check the phone number.");
           }
           showToast("An OTP has been sent to your phone.");
-        } catch (e: any) {
-          setError(e.message);
+        } catch (e) {
+          setError(e instanceof Error ? e.message : "Failed to send OTP. Please check the phone number.");
         } finally {
           setIsLoading(false);
         }
@@ -62,8 +62,8 @@ export function OtpVerificationModal({ open, phone, onClose, onSuccess }: OtpVer
       }
       showToast("Phone number verified!");
       onSuccess();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to verify OTP.");
     } finally {
       setIsLoading(false);
     }
