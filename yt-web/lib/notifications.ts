@@ -16,9 +16,9 @@ export interface OrderNotifyContext {
 
 export function buyerSmsPayload(ctx: OrderNotifyContext): string {
   if (ctx.isGiftOrder) {
-    return `Yanney Trendss: Order ${ctx.orderRef} — ${ctx.status}. Payment & receipt sent to you. Thank you!`;
+    return `Yanney Trendss: Order ${ctx.orderRef} ${ctx.status}. Payment & receipt sent to you. Thank you!`;
   }
-  return `Yanney Trendss: Order ${ctx.orderRef} — ${ctx.status}.`;
+  return `Yanney Trendss: Order ${ctx.orderRef} ${ctx.status}.`;
 }
 
 export function recipientSmsPayload(ctx: OrderNotifyContext): string | null {

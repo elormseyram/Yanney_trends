@@ -145,7 +145,7 @@ export function StylistQuiz({
   }, [step, ranked]);
 
   const wa = buildWhatsAppPrefill(
-    "Hi Yanney Trendss — I loved my style quiz results and want a stylist to help me choose!",
+    "Hi Yanney Trendss, I loved my style quiz results and want a stylist to help me choose!",
     SHOP_WHATSAPP,
   );
 

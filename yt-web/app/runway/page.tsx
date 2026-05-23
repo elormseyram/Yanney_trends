@@ -5,7 +5,7 @@ import { getRunwayOutfitPosts } from "@/lib/runway.server";
 export const revalidate = 30;
 
 export const metadata = {
-  title: "Inspo — Yanney Trendss",
+  title: "Inspo | Yanney Trendss",
   description: "Browse the collection in a Pinterest-style inspiration board.",
 };
 

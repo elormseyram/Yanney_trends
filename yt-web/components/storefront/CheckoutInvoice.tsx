@@ -153,7 +153,7 @@ export function CheckoutInvoice({
       </div>
 
       <p className="mt-6 text-center font-jost text-[10px] text-brand-dimmed">
-        Thank you — Yanney Trendss · Dansoman, Accra
+        Thank you. Yanney Trendss · Dansoman, Accra
       </p>
     </motion.div>
   );

@@ -9,8 +9,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Yanney Hub — Admin & Owner",
-  description: "Boutique operations for Yanney Trendss — orders, catalog, owner insights.",
+  title: "Yanney Hub | Admin & Owner",
+  description: "Boutique operations for Yanney Trendss. Orders, catalog, owner insights.",
   robots: { index: false, follow: false },
 };
 

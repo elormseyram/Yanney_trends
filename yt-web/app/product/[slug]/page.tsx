@@ -19,10 +19,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const catalog = await getCatalogProducts();
   const p = findProductInCatalog(catalog, slug);
-  if (!p) return { title: "Product — Yanney Trendss" };
+  if (!p) return { title: "Product | Yanney Trendss" };
   const desc = (p.cardSubtitle ?? p.description ?? "").trim().slice(0, 160) || p.name;
   return {
-    title: `${p.name} — Yanney Trendss`,
+    title: `${p.name} | Yanney Trendss`,
     description: desc,
   };
 }

@@ -3,7 +3,7 @@ import { StylistQuiz } from "./stylist-quiz";
 import { getCatalogProducts } from "@/lib/catalog.server";
 
 export const metadata: Metadata = {
-  title: "Style Me — Yanney Trendss",
+  title: "Style Me | Yanney Trendss",
   description: "Find your perfect look in five questions.",
 };
 

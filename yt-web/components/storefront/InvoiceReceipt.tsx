@@ -239,7 +239,7 @@ export function InvoiceReceipt({ order }: { order: ReceiptOrder }) {
       </dl>
 
       <p className="mt-7 text-center font-jost text-[10px] tracking-wide text-brand-dimmed">
-        Thank you for shopping with us — Yanney Trendss · Dansoman, Accra
+        Thank you for shopping with us. Yanney Trendss · Dansoman, Accra
       </p>
     </article>
   );

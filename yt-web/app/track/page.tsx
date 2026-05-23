@@ -2,7 +2,7 @@ import Link from "next/link";
 import { TrackOrderLookup } from "@/components/storefront/TrackOrderLookup";
 
 export const metadata = {
-  title: "Track order — Yanney Trendss",
+  title: "Track order | Yanney Trendss",
 };
 
 export default function TrackLookupPage() {

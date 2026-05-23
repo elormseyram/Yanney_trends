@@ -13,15 +13,15 @@ const delays = [0, 0.12, 0.24, 0.36, 0.48];
 const HERO_IMAGES = [
   {
     src: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=1200&h=1600&fit=crop",
-    alt: "Yanney Trendss — editorial look one",
+    alt: "Yanney Trendss editorial look one",
   },
   {
     src: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=1200&h=1600&fit=crop",
-    alt: "Yanney Trendss — editorial look two",
+    alt: "Yanney Trendss editorial look two",
   },
   {
     src: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=1200&h=1600&fit=crop",
-    alt: "Yanney Trendss — editorial look three",
+    alt: "Yanney Trendss editorial look three",
   },
 ];
 
@@ -29,7 +29,7 @@ const SLIDE_MS = 5000;
 
 export function HeroSection() {
   const wa = buildWhatsAppPrefill(
-    "Hello Yanney Trendss — I'd love to shop your new collection. Can you help me pick a size?",
+    "Hello Yanney Trendss, I'd love to shop your new collection. Can you help me pick a size?",
     SHOP_WHATSAPP,
   );
 

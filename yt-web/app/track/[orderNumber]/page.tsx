@@ -34,7 +34,7 @@ export default async function TrackPage({ params, searchParams }: TrackPageProps
   const order = data as unknown as ReceiptOrder | null;
 
   const wa = buildWhatsAppPrefill(
-    `Hi Yanney Trendss — question about order ${orderNumber}`,
+    `Hi Yanney Trendss, question about order ${orderNumber}`,
     SHOP_WHATSAPP,
   );
 
