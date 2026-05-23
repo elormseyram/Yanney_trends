@@ -78,6 +78,7 @@ const navLink =
 const mobileLinks = [
   { href: "/shop", label: "Shop", Icon: IconShop },
   { href: "/stylist", label: "Style me", Icon: IconSpark },
+  { href: "/checkout", label: "My Orders", Icon: IconUser },
   { href: "/runway", label: "Inspo", Icon: IconInspo },
   { href: "/find-us", label: "Find us", Icon: IconMapPin },
   { href: "/contact", label: "Contact", Icon: IconMail },
@@ -97,7 +98,7 @@ export function Navbar() {
           href="/"
           className="shrink-0 font-playfair text-base tracking-tight text-brand-text sm:text-lg"
         >
-          Yanney <span className="text-brand-pink">Trends</span>
+          Yanney <span className="text-brand-pink">Trendss</span>
         </Link>
         <button
           type="button"
@@ -119,7 +120,7 @@ export function Navbar() {
             <IconSpark className="h-4 w-4 opacity-80" />
             Style me
           </Link>
-          <Link href="/account/orders" className={navLink}>
+          <Link href="/checkout" className={navLink}>
             <IconUser className="h-4 w-4 opacity-80" />
             My Orders
           </Link>
