@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { ProductCard } from "@/components/storefront/ProductCard";
 import { DeliveryCountdownBanner } from "@/components/storefront/DeliveryCountdownBanner";
+import { MarqueeTicker } from "@/components/storefront/MarqueeTicker";
 import type { CatalogProduct } from "@/types/product";
 import { choice } from "@/lib/choiceStyles";
 import {
@@ -130,6 +131,7 @@ export function ShopShell({
   return (
     <div className="min-h-screen bg-brand-surface">
       <DeliveryCountdownBanner />
+      <MarqueeTicker />
       <div className="relative overflow-hidden border-b border-brand-pink/30">
         <div
           className="pointer-events-none absolute inset-0 bg-cover bg-center"
