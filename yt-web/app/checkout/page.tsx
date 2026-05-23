@@ -1,79 +1,339 @@
-import { createClient } from "@/lib/supabase/server";
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { type ReceiptOrder } from "@/components/storefront/InvoiceReceipt";
+import { useCartStore } from "@/store/cartStore";
+import { TermsBeforePaymentModal } from "@/components/storefront/TermsBeforePaymentModal";
+import { GiftCheckoutPanel, type GiftFormState } from "@/components/storefront/GiftCheckoutPanel";
+import { EmptyCartCheckoutAnimation } from "@/components/storefront/EmptyCartCheckoutAnimation";
+import { DELIVERY_ZONES } from "@/lib/deliveryZones";
 
-export const dynamic = "force-dynamic";
-
-function OrderHistoryItem({ order }: { order: ReceiptOrder }) {
-    const placedAt = order.created_at ? new Date(order.created_at) : null;
-    return (
-        <Link href={`/track/${order.order_number}`} className="block rounded-lg border border-brand-border bg-brand-surface p-4 transition hover:shadow-md">
-            <div className="flex justify-between items-start">
-                <div>
-                    <p className="font-jost text-sm font-semibold text-brand-text">Order {order.order_number}</p>
-                    <p className="font-jost text-xs text-brand-muted">
-                        {placedAt ? placedAt.toLocaleDateString("en-GH", { dateStyle: "long" }) : "N/A"}
-                    </p>
-                </div>
-                <span className="rounded-full bg-brand-pink-muted px-3 py-1 font-jost text-xs font-medium text-brand-pink">{order.status}</span>
-            </div>
-            <p className="mt-2 font-jost text-lg font-semibold text-brand-text">GHS {Number(order.total ?? 0).toFixed(2)}</p>
-        </Link>
-    )
+function genRef(): string {
+  return `YT${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 5).toUpperCase()}`;
 }
 
-export default async function OrderHistoryPage() {
-  const supabase = await createClient();
+const EMPTY_GIFT: GiftFormState = {
+  isGiftOrder: false,
+  recipientName: "",
+  recipientPhone: "",
+  recipientCity: "",
+  recipientAddress: "",
+  deliveryNotes: "",
+  relationship: "Friend",
+  giftMessage: "",
+  hidePrice: false,
+  sizeAssistMode: null,
+  bodyDescription: "",
+  stylistSize: null,
+};
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+const field =
+  "mt-1 w-full rounded-lg border border-brand-border bg-brand-elevated px-3 py-2.5 font-jost text-sm text-brand-text outline-none focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/15";
 
-  if (!user) {
-    return (
-        <div className="min-h-screen bg-brand-surface py-24 text-center">
-            <h1 className="font-playfair text-2xl text-brand-text">Order History</h1>
-            <p className="mt-4 font-jost text-brand-muted">Please sign in to view your order history.</p>
-            <p className="mt-2 font-jost text-sm text-brand-muted">You can sign in during checkout by verifying your phone number.</p>
-            <Link href="/shop" className="mt-8 inline-block rounded-lg bg-brand-pink px-6 py-3 font-jost text-sm font-semibold text-white">
-                Continue Shopping
-            </Link>
-        </div>
-    );
+export default function CheckoutPage() {
+  const items = useCartStore((s) => s.items);
+  const clearCart = useCartStore((s) => s.clearCart);
+
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [fulfillment, setFulfillment] = useState<"DELIVERY" | "PICKUP">("DELIVERY");
+  const [zone, setZone] = useState(DELIVERY_ZONES[0].id);
+  const [address, setAddress] = useState("");
+  const [gift, setGift] = useState<GiftFormState>(EMPTY_GIFT);
+  const [termsOpen, setTermsOpen] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const selectedZone = DELIVERY_ZONES.find((z) => z.id === zone) ?? DELIVERY_ZONES[0];
+  const deliveryFee = fulfillment === "DELIVERY" ? selectedZone.riderFeeGhs : 0;
+  const subtotal = items.reduce((t, i) => t + i.unitPrice * i.quantity, 0);
+  const total = subtotal + deliveryFee;
+
+  const canProceed =
+    name.trim().length > 1 &&
+    phone.trim().length >= 9 &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) &&
+    (fulfillment === "PICKUP" || address.trim().length > 3) &&
+    items.length > 0;
+
+  async function handleAccepted() {
+    setTermsOpen(false);
+    setPaying(true);
+    setError(null);
+
+    try {
+      // Save name to user profile (email stored in orders/paystack)
+      await fetch("/api/auth/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), email: email.trim() }),
+      });
+
+      const orderNumber = genRef();
+      const res = await fetch("/api/paystack/initialize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          order_number: orderNumber,
+          customer_name: name.trim(),
+          customer_phone: phone.trim(),
+          customer_email: email.trim(),
+          fulfillment_type: fulfillment,
+          delivery_address: fulfillment === "DELIVERY" ? address.trim() : null,
+          delivery_zone: fulfillment === "DELIVERY" ? zone : null,
+          items: items.map((i) => ({
+            product_id: i.productId,
+            name: i.name,
+            size: i.size,
+            color: i.color ?? null,
+            quantity: i.quantity,
+            unit_price: i.unitPrice,
+          })),
+          subtotal,
+          delivery_fee: deliveryFee,
+          total,
+          currency: "GHS",
+          is_gift_order: gift.isGiftOrder,
+          gift_message: gift.giftMessage || null,
+          relationship: gift.relationship || null,
+          recipient_name: gift.isGiftOrder ? gift.recipientName : null,
+          recipient_phone: gift.isGiftOrder ? gift.recipientPhone : null,
+          recipient_city: gift.isGiftOrder ? gift.recipientCity : null,
+          recipient_address: gift.isGiftOrder ? gift.recipientAddress : null,
+          gift_delivery_notes: gift.isGiftOrder ? gift.deliveryNotes : null,
+        }),
+      });
+
+      const data = await res.json();
+      if (!data.ok || !data.authorization_url) {
+        throw new Error(data.message ?? "Could not start payment. Please try again.");
+      }
+
+      clearCart();
+      window.location.href = data.authorization_url;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+      setPaying(false);
+    }
   }
 
-  const { data: orders, error } = await supabase
-    .from("orders")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Error fetching order history:", error);
+  if (items.length === 0 && !paying) {
+    return <EmptyCartCheckoutAnimation />;
   }
 
   return (
-    <div className="min-h-screen bg-brand-surface py-24">
-      <div className="mx-auto max-w-4xl px-4">
-        <h1 className="font-playfair text-3xl text-brand-text">My Orders</h1>
-        <p className="mt-2 font-jost text-sm text-brand-muted">A list of your past and current orders with Yanney Trendss.</p>
-        
-        {orders && orders.length > 0 ? (
-            <div className="mt-8 space-y-4">
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                {orders.map((order: any) => (
-                    <OrderHistoryItem key={order.id} order={order as unknown as ReceiptOrder} />
-                ))}
-            </div>
-        ) : (
-            <div className="mt-12 text-center">
-                <p className="font-jost text-brand-muted">You haven&apos;t placed any orders yet.</p>
-                <Link href="/shop" className="mt-6 inline-block rounded-lg bg-brand-pink px-6 py-3 font-jost text-sm font-semibold text-white">
-                    Start Shopping
-                </Link>
-            </div>
+    <div className="min-h-screen bg-brand-surface px-4 py-12 sm:px-6">
+      <div className="mx-auto max-w-4xl">
+        <h1 className="font-playfair text-2xl text-brand-text">Checkout</h1>
+        <p className="mt-1 font-jost text-sm text-brand-muted">
+          Fill in your details and we&apos;ll send a one-time code to confirm your order.
+        </p>
+
+        {error && (
+          <div className="mt-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 font-jost text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-400">
+            {error}
+          </div>
         )}
+
+        <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_340px]">
+          {/* Left column: form */}
+          <div className="space-y-6">
+            {/* Contact details */}
+            <section className="rounded-xl border border-brand-border bg-brand-bg p-5">
+              <h2 className="font-jost text-[10px] font-semibold uppercase tracking-widest text-brand-pink">
+                Your details
+              </h2>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <label className="block sm:col-span-2">
+                  <span className="font-jost text-xs text-brand-dimmed">Full name *</span>
+                  <input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Ama Boateng"
+                    className={field}
+                  />
+                </label>
+                <label className="block">
+                  <span className="font-jost text-xs text-brand-dimmed">Phone number * (receives OTP)</span>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+233 XX XXX XXXX"
+                    className={field}
+                  />
+                </label>
+                <label className="block">
+                  <span className="font-jost text-xs text-brand-dimmed">Email address *</span>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@email.com"
+                    className={field}
+                  />
+                </label>
+              </div>
+            </section>
+
+            {/* Fulfillment */}
+            <section className="rounded-xl border border-brand-border bg-brand-bg p-5">
+              <h2 className="font-jost text-[10px] font-semibold uppercase tracking-widest text-brand-pink">
+                Delivery or pickup
+              </h2>
+              <div className="mt-4 flex gap-3">
+                {(["DELIVERY", "PICKUP"] as const).map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setFulfillment(type)}
+                    className={`flex-1 rounded-lg border py-3 font-jost text-sm transition ${
+                      fulfillment === type
+                        ? "border-brand-pink bg-brand-pink text-white"
+                        : "border-brand-border text-brand-muted hover:border-brand-pink"
+                    }`}
+                  >
+                    {type === "DELIVERY" ? "Delivery" : "Boutique Pickup"}
+                  </button>
+                ))}
+              </div>
+
+              {fulfillment === "DELIVERY" && (
+                <div className="mt-4 space-y-4">
+                  <label className="block">
+                    <span className="font-jost text-xs text-brand-dimmed">Delivery zone *</span>
+                    <select
+                      value={zone}
+                      onChange={(e) => setZone(e.target.value)}
+                      className={field}
+                    >
+                      {DELIVERY_ZONES.map((z) => (
+                        <option key={z.id} value={z.id}>
+                          {z.label} — GHS {z.riderFeeGhs} ({z.eta})
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="block">
+                    <span className="font-jost text-xs text-brand-dimmed">Delivery address *</span>
+                    <textarea
+                      rows={2}
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      placeholder="House number, street, neighbourhood..."
+                      className={field}
+                    />
+                  </label>
+                </div>
+              )}
+
+              {fulfillment === "PICKUP" && (
+                <p className="mt-3 font-jost text-xs text-brand-muted">
+                  Dansoman, Accra. Bring your order reference and a valid ID.
+                </p>
+              )}
+            </section>
+
+            {/* Gift */}
+            <GiftCheckoutPanel
+              buyerName={name}
+              buyerPhone={phone}
+              buyerEmail={email}
+              value={gift}
+              onChange={setGift}
+            />
+          </div>
+
+          {/* Right column: order summary */}
+          <div className="space-y-4">
+            <div className="rounded-xl border border-brand-border bg-brand-bg p-5">
+              <h2 className="font-jost text-[10px] font-semibold uppercase tracking-widest text-brand-pink">
+                Order summary
+              </h2>
+              <ul className="mt-4 space-y-3">
+                {items.map((item) => (
+                  <li
+                    key={`${item.productId}-${item.size}-${item.color ?? ""}`}
+                    className="flex gap-3"
+                  >
+                    <div className="relative h-14 w-11 shrink-0 overflow-hidden rounded-lg border border-brand-border bg-brand-elevated">
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                        sizes="44px"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-jost text-sm text-brand-text">{item.name}</p>
+                      <p className="font-jost text-xs text-brand-muted">
+                        {item.size}
+                        {item.color ? ` · ${item.color}` : ""} × {item.quantity}
+                      </p>
+                    </div>
+                    <p className="font-jost text-sm text-brand-text">
+                      GHS {(item.unitPrice * item.quantity).toFixed(2)}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-4 space-y-1.5 border-t border-brand-border pt-4 font-jost text-sm">
+                <div className="flex justify-between text-brand-muted">
+                  <span>Subtotal</span>
+                  <span>GHS {subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-brand-muted">
+                  <span>Delivery</span>
+                  <span>
+                    {fulfillment === "PICKUP" ? "Free" : `GHS ${deliveryFee.toFixed(2)}`}
+                  </span>
+                </div>
+                <div className="flex justify-between border-t border-brand-border pt-2 font-semibold text-brand-text">
+                  <span>Total</span>
+                  <span>GHS {total.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              disabled={!canProceed || paying}
+              onClick={() => setTermsOpen(true)}
+              className="w-full rounded-xl bg-brand-pink py-3.5 font-jost text-sm font-semibold text-white transition hover:bg-brand-pink-hover disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {paying ? "Processing..." : "Review terms & pay"}
+            </button>
+
+            {!canProceed && items.length > 0 && (
+              <p className="text-center font-jost text-[11px] text-brand-muted">
+                Fill in all required fields above to continue.
+              </p>
+            )}
+
+            <p className="text-center font-jost text-[11px] text-brand-muted">
+              You&apos;ll pay with Mobile Money on the next screen.
+            </p>
+
+            <Link
+              href="/shop"
+              className="block text-center font-jost text-xs text-brand-muted hover:text-brand-pink"
+            >
+              ← Continue shopping
+            </Link>
+          </div>
+        </div>
       </div>
+
+      <TermsBeforePaymentModal
+        open={termsOpen}
+        phone={phone}
+        onClose={() => setTermsOpen(false)}
+        onAccept={handleAccepted}
+      />
     </div>
   );
 }
